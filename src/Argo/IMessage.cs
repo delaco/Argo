@@ -2,9 +2,11 @@
 {
     public interface IMessage
     {
-        uint CommandId { get; }
+        int Command { get; }
 
-        uint SequenceId { get; }
+        int Sequence { get; }
+
+        short Option { get; }
 
         byte[] Body { get; }
 

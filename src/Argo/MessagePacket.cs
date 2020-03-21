@@ -6,20 +6,30 @@
 
         public byte[] Body { get; }
 
-        public uint CommandId { get; }
+        public int Command { get; }
 
-        public uint SequenceId { get; }
+        public int Sequence { get; }
 
-        public MessagePacket(uint commandId, uint sequenceId, byte[] body)
+        public short Option { get; } = 0;
+
+        public MessagePacket(int command, short option, int sequence, byte[] body)
         {
-            CommandId = commandId;
-            SequenceId = sequenceId;
+            Command = command;
+            Option = option;
+            Sequence = sequence;
+            Body = body;
+        }
+
+        public MessagePacket(int command, int sequence, byte[] body)
+        {
+            Command = command;
+            Sequence = sequence;
             Body = body;
         }
 
         public override string ToString()
         {
-            return $"{this.GetType().Name}[CommandId={this.CommandId},SequenceId={this.SequenceId},Lenth={Body.Length}]";
+            return $"{this.GetType().Name}[Command={this.Command},Sequence={this.Sequence},Lenth={Body.Length}]";
         }
     }
 }

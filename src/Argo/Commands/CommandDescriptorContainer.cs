@@ -42,7 +42,7 @@ namespace Argo.Commands
 
             var cache = Current;
 
-            if (cache.Entries.TryGetValue(context.Message.CommandId, out CommandDescriptor descriptor))
+            if (cache.Entries.TryGetValue(context.Message.Command, out CommandDescriptor descriptor))
             {
                 return descriptor;
             }

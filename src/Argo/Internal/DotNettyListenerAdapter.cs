@@ -63,6 +63,7 @@ namespace Argo.Internal
                        else // websocket support
                        {
                            pipeline.AddLast(new HttpServerCodec());
+                           pipeline.AddLast("framing-enc", new WebSocketHeaderPrepender());
                            pipeline.AddLast(new HttpObjectAggregator(65536));
                            pipeline.AddLast(new WebSocketServerHandler(_serviceProvider, _options));
                        }

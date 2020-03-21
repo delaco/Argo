@@ -12,7 +12,12 @@ namespace Argo.Commands
 
         public DefaultCommandActivator(ITypeActivatorCache typeActivatorCache)
         {
-            _typeActivatorCache = typeActivatorCache ?? throw new ArgumentNullException(nameof(typeActivatorCache));
+            if (typeActivatorCache == null)
+            {
+                throw new ArgumentNullException(nameof(typeActivatorCache));
+            }
+
+            _typeActivatorCache = typeActivatorCache;
         }
 
         public virtual object Create(CommandContext commandContext)
@@ -52,7 +57,8 @@ namespace Argo.Commands
                 throw new ArgumentNullException(nameof(command));
             }
 
-            if (command is IDisposable disposable)
+            var disposable = command as IDisposable;
+            if (disposable != null)
             {
                 disposable.Dispose();
             }

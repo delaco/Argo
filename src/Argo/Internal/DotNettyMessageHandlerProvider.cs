@@ -1,13 +1,13 @@
 ﻿using DotNetty.Transport.Channels;
 
-namespace Argo
+namespace Argo.Internal
 {
-    public class DotNettyMessageHandlerFactory : IMessageHandlerFactory
+    internal class DotNettyMessageHandlerProvider : IMessageHandlerProvider
     {
         private IChannel _channel;
         private ClientWaits _clientWaits;
 
-        public DotNettyMessageHandlerFactory(IChannel channel, ClientWaits clientWaits)
+        public DotNettyMessageHandlerProvider(IChannel channel, ClientWaits clientWaits)
         {
             this._channel = channel;
             this._clientWaits = clientWaits;

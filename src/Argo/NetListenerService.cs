@@ -28,6 +28,7 @@ namespace Argo
             _options = options.Value;
             _netListeners = new List<INetListener>();
             _netListenerFactory = netListenerFactory ?? throw new ArgumentNullException(nameof(netListenerFactory));
+
             _logger = loggerFactory.CreateLogger<NetListenerService>();
         }
 

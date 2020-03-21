@@ -11,16 +11,16 @@ namespace Argo.Commands
         /// <summary>
         /// The value which key a command handler
         /// </summary>
-        public uint Id { get; }
+        public int Id { get; }
 
         public bool Invalid { get; }
 
-        public CommandAttribute(uint key)
-            : this(key, false)
+        public CommandAttribute(int id)
+            : this(id, false)
         {
         }
 
-        public CommandAttribute(uint id, bool invalid)
+        public CommandAttribute(int id, bool invalid)
         {
             Id = id;
             Invalid = invalid;
@@ -33,7 +33,7 @@ namespace Argo.Commands
 
         public CommandAttribute(string key, bool invalid)
         {
-            Id = (uint)key.GetHashCode();
+            Id = (int)key.GetHashCode();
             Invalid = invalid;
         }
     }

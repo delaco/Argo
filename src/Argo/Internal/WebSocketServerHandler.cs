@@ -22,6 +22,7 @@ namespace Argo.Internal
         static readonly AttributeKey<Session> SessionKey = AttributeKey<Session>.ValueOf(nameof(Session));
 
         private IServiceProvider _serviceProvider;
+        private SessionContainer<Session> _sessionContainer;
         private ICommandDescriptorContainer _commandContainer;
         private WebSocketServerHandshaker _handshaker;
         private ICommandActivator _commandActivator;
@@ -30,6 +31,7 @@ namespace Argo.Internal
 
         public WebSocketServerHandler(IServiceProvider serviceProvider, NetListenerOptions netListenerOptions)
         {
+            this._sessionContainer = serviceProvider.GetRequiredService<SessionContainer<Session>>();
             this._serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
             this._netListenerOptions = netListenerOptions ?? throw new ArgumentNullException(nameof(netListenerOptions));
 
@@ -79,6 +81,13 @@ namespace Argo.Internal
             }
             else
             {
+                _logger.LogInformation($"New client to handshake:{ctx.Channel}");
+                var channel = ctx.Channel;
+                var session = new Session();
+                session.Initialize(channel.RemoteAddress, new DotNettyMessageHandlerProvider(channel, null));
+
+                ctx.Channel.GetAttribute(SessionKey).Set(session);
+                this._sessionContainer.Set(channel.Id.ToString(), session);
                 this._handshaker.HandshakeAsync(ctx.Channel, req);
             }
         }
@@ -88,32 +97,33 @@ namespace Argo.Internal
             switch (frame)
             {
                 // Check for closing frame
-                case CloseWebSocketFrame closeWebSocketFrame:
+                case CloseWebSocketFrame _:
                     this._handshaker.CloseAsync(ctx.Channel, (CloseWebSocketFrame)frame.Retain());
                     return;
-                case PingWebSocketFrame pingWebSocketFrame:
+                case PingWebSocketFrame _:
                     ctx.WriteAsync(new PongWebSocketFrame((IByteBuffer)frame.Content.Retain()));
                     return;
-                case TextWebSocketFrame textWebSocketFrame:
+                case TextWebSocketFrame _:
                     ctx.WriteAsync(frame.Retain());
                     return;
-                case BinaryWebSocketFrame binaryWebSocketFrame:
-                    HandleBinaryWebSocketFrame(ctx, binaryWebSocketFrame);
-                    break;
+                case BinaryWebSocketFrame _:
+                    HandleBinaryWebSocketFrame(ctx, (BinaryWebSocketFrame)frame.Retain());
+                    return;
             }
         }
 
         void HandleBinaryWebSocketFrame(IChannelHandlerContext context, BinaryWebSocketFrame binaryWebSocketFrame)
         {
             var byteBuffer = binaryWebSocketFrame.Content;
-            var cmdId = GetFrameValue(byteBuffer, 0, 4);
-            var seqId = GetFrameValue(byteBuffer, 8, 4);
+            var cmd = GetFrameValue(byteBuffer, 0, 4);
+            var opt = GetFrameValue(byteBuffer, 4, 2);
+            var seq = GetFrameValue(byteBuffer, 6, 4);
 
-            var bodyBuff = byteBuffer.SkipBytes(12);
+            var bodyBuff = byteBuffer.SkipBytes(14);
             var body = new byte[bodyBuff.ReadableBytes];
             bodyBuff.ReadBytes(body);
 
-            var message = new MessagePacket((uint)cmdId, (uint)seqId, body);
+            var message = new MessagePacket((int)cmd, (short)opt, (int)seq, body);
 
             var session = context.Channel.GetAttribute(SessionKey).Get();
             session.LastAccessTime = DateTime.Now;

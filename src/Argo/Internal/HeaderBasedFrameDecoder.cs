@@ -9,7 +9,7 @@ namespace Argo
         private readonly ByteOrder _byteOrder;
 
         public HeaderBasedFrameDecoder()
-            : base(ByteOrder.LittleEndian, ushort.MaxValue, 4, 4, 4, 0, true)
+            : base(ByteOrder.LittleEndian, ushort.MaxValue, 10, 4, 0, 0, true)
         {
             _byteOrder = ByteOrder.LittleEndian;
         }
@@ -18,13 +18,15 @@ namespace Argo
         {
             if (base.Decode(context, input) is IByteBuffer byteBuffer)
             {
-                var cmdId = base.GetUnadjustedFrameLength(byteBuffer, 0, 4, _byteOrder);
-                var seqId = base.GetUnadjustedFrameLength(byteBuffer, 8, 4, _byteOrder);
+                var cmd = base.GetUnadjustedFrameLength(byteBuffer, 0, 4, _byteOrder);
+                var opt = base.GetUnadjustedFrameLength(byteBuffer, 4, 2, _byteOrder);
+                var seq = base.GetUnadjustedFrameLength(byteBuffer, 6, 4, _byteOrder);
 
-                var bodyBuff = byteBuffer.SkipBytes(12);
+                var bodyBuff = byteBuffer.SkipBytes(14);
                 var body = new byte[bodyBuff.ReadableBytes];
                 bodyBuff.ReadBytes(body);
-                var message = new MessagePacket((uint)cmdId, (uint)seqId, body);
+
+                var message = new MessagePacket((int)cmd, (short)opt, (int)seq, body);
 
                 return message;
             }

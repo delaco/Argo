@@ -11,19 +11,19 @@ namespace Argo
         private ICommandDescriptorContainer _commandContainer;
         private ICommandActivator _commandActivator;
         private IPassThroughRuleProvider _passthroughRuleProvider;
-        private ILogger _logger;
+        private ILogger<MessageRouter> _logger;
 
         public MessageRouter(IServiceProvider serviceProvider,
             ICommandDescriptorContainer commandContainer,
             ICommandActivator commandActivator,
             IPassThroughRuleProvider passthroughRuleProvider,
-            ILoggerFactory loggerFactory)
+            ILogger<MessageRouter> logger)
         {
             _serviceProvider = serviceProvider ?? throw new NullReferenceException(nameof(serviceProvider));
             _commandContainer = commandContainer ?? throw new NullReferenceException(nameof(commandContainer));
             _commandActivator = commandActivator ?? throw new NullReferenceException(nameof(commandActivator));
             _passthroughRuleProvider = passthroughRuleProvider ?? throw new NullReferenceException(nameof(passthroughRuleProvider));
-            _logger = loggerFactory.CreateLogger<MessageRouter>();
+            _logger = logger;
         }
 
         public virtual void Route(RequestContext requestContext)

@@ -15,6 +15,11 @@ namespace Argo
         /// <returns></returns>
         Task SendAsync(IMessage message);
 
-        IMessage Send(IMessage message);
+        /// <summary>
+        /// Send
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        Task<IMessage> Send(IMessage message);
     }
 }

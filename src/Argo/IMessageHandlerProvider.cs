@@ -1,6 +1,6 @@
 ﻿namespace Argo
 {
-    public interface IMessageHandlerFactory
+    public interface IMessageHandlerProvider
     {
         IMessageHandler Create();
     }

@@ -1,70 +1,67 @@
-﻿using System;
+﻿using Microsoft.Extensions.ObjectPool;
+using System;
 using System.Collections.Concurrent;
 
 namespace Argo
 {
     public interface ISocketClientPoolContainer
     {
-        SocketClient Get(string connectionName);
+        SocketClient Get(string remoteName);
 
-        void Release(SocketClient client);
+        void Return(SocketClient client);
     }
 
     public class SocketClientPoolContainer : ISocketClientPoolContainer
     {
-        private readonly ConcurrentDictionary<string, ConcurrentQueue<SocketClient>> _clientsDict
-            = new ConcurrentDictionary<string, ConcurrentQueue<SocketClient>>();
+        private readonly ConcurrentDictionary<string, ObjectPool<SocketClient>> _objectPoolDict
+            = new ConcurrentDictionary<string, ObjectPool<SocketClient>>();
 
+        private RemoteOptions _options;
         private ISocketClientProvider _socketClientProvider;
+        private ObjectPoolProvider _objectPoolProvider;
 
-        public SocketClientPoolContainer(ISocketClientProvider socketClientProvider)
+        public SocketClientPoolContainer(RemoteOptions options,
+            ISocketClientProvider socketClientProvider,
+            ObjectPoolProvider objectPoolProvider)
         {
-            _socketClientProvider = socketClientProvider;
+            this._options = options ?? throw new ArgumentNullException(nameof(options));
+            _objectPoolProvider = objectPoolProvider ?? throw new ArgumentNullException(nameof(objectPoolProvider));
+            _socketClientProvider = socketClientProvider ?? throw new ArgumentNullException(nameof(socketClientProvider));
         }
 
-        public SocketClient Get(string connectionName)
+        public SocketClient Get(string remoteName)
         {
-            SocketClient client = default;
-            if (_clientsDict.TryGetValue(connectionName, out ConcurrentQueue<SocketClient> clientQueue))
+            if (!_objectPoolDict.TryGetValue(remoteName, out ObjectPool<SocketClient> objectPool))
             {
-                while (true)
+                var option = _options.Remotes.Find(v => v.Name == remoteName);
+                if (option == null)
                 {
-                    clientQueue.TryDequeue(out client);
-
-                    if (client == null)
-                        break;
+                    throw new IndexOutOfRangeException(nameof(remoteName));
                 }
+
+                if (_objectPoolProvider is DefaultObjectPoolProvider defaultObjectPoolProvider)
+                {
+                    int poolSize = option.PoolSize;
+                    defaultObjectPoolProvider.MaximumRetained = poolSize;
+                }
+
+                objectPool = _objectPoolProvider.Create(new SocketClientPooledObjectPolicy(option, _socketClientProvider));
+                _objectPoolDict.TryAdd(remoteName, objectPool);
+            }
+
+            return objectPool.Get();
+        }
+
+        public void Return(SocketClient client)
+        {
+            if (_objectPoolDict.TryGetValue(client.RemoteName, out ObjectPool<SocketClient> objectPool))
+            {
+                objectPool.Return(client);
             }
             else
             {
-                clientQueue = new ConcurrentQueue<SocketClient>();
-                _clientsDict.TryAdd(connectionName, clientQueue);
+                client.Dispose();
             }
-
-            return client ?? Create(connectionName);
-        }
-
-        public void Release(SocketClient client)
-        {
-            var connectionName = client.ConnectionName;
-            if (!_clientsDict.TryGetValue(connectionName, out ConcurrentQueue<SocketClient> clientQueue))
-            {
-                clientQueue = new ConcurrentQueue<SocketClient>();
-                _clientsDict.TryAdd(connectionName, clientQueue);
-            }
-
-            clientQueue.Enqueue(client);
-        }
-
-        private SocketClient Create(string connectionName)
-        {
-            var client = _socketClientProvider.Create(connectionName);
-            if (client == null)
-            {
-                throw new Exception($"The {connectionName} failed to create the client");
-            }
-
-            return client;
         }
     }
 }

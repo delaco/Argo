@@ -1,12 +1,33 @@
-﻿using System;
+﻿using Argo;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
 
 namespace SimpleServer
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            var config = new ConfigurationBuilder()
+               .AddJsonFile("appsettings.json")
+               .Build();
+
+            var host = new HostBuilder()
+                .UseArgo(config)
+                .ConfigureServices((service) =>
+                {
+                    service.AddSocketClient(config);
+                })
+                .ConfigureLogging((loggingBuilder) =>
+                {
+                    loggingBuilder.AddConfiguration(config.GetSection("logging"));
+                    loggingBuilder.AddConsole();
+                })
+                .Build();
+
+            await host.StartAsync();
         }
     }
 }

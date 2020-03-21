@@ -8,7 +8,7 @@ namespace Argo.Commands
         /// <summary>
         /// Gets or sets descriptor's key
         /// </summary>
-        public uint Key { get; set; }
+        public int Key { get; set; }
 
         /// <summary>
         /// Gets or sets descriptor's name

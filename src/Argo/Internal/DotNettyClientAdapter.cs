@@ -4,33 +4,28 @@ using DotNetty.Transport.Bootstrapping;
 using DotNetty.Transport.Channels;
 using DotNetty.Transport.Channels.Sockets;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading.Tasks;
 
-namespace Argo
+namespace Argo.Internal
 {
-    public class DottNettyClientAdapter : ISocketClientProvider
+    internal class DottNettyClientAdapter : ISocketClientProvider
     {
-        private RemoteOptions _options;
+        private ILogger<DottNettyClientAdapter> _logger;
         private IServiceProvider _serviceProvider;
 
-
-        public DottNettyClientAdapter(RemoteOptions options, IServiceProvider serviceProvider)
+        public DottNettyClientAdapter(ILogger<DottNettyClientAdapter> logger, IServiceProvider serviceProvider)
         {
-            this._options = options ?? throw new ArgumentNullException(nameof(options));
+            this._logger = logger;
             _serviceProvider = serviceProvider;
         }
 
-        public SocketClient Create(string connectionName)
+        public SocketClient Create(SocketClientOptions option)
         {
             var group = new MultithreadEventLoopGroup();
-            var option = _options.Remotes.Find(v => v.Name == connectionName);
-            if (option == null)
-            {
-                throw new IndexOutOfRangeException(nameof(_options));
-            }
+
 
             Bootstrap bootstrap;
             if (option.ProtocolType == ProtocolType.Tcp)
@@ -47,7 +42,7 @@ namespace Argo
                        pipeline.AddLast("framing-enc", new HeaderPrepender());
                        pipeline.AddLast("framing-dec", new HeaderBasedFrameDecoder());
                        pipeline.AddLast(new SyncReceiverHandler<IMessage>(_serviceProvider, true));
-                       //pipeline.AddLast(new ReceiverHandler<IMessage>(_serviceProvider, true));
+                       pipeline.AddLast(new ReceiverHandler<IMessage>(_serviceProvider, true));
                    }));
             }
             else
@@ -60,7 +55,8 @@ namespace Argo
                 .GetAwaiter()
                 .GetResult();
             var clientWait = _serviceProvider.GetRequiredService<ClientWaits>();
-            var tcpClient = new SocketClient(option.Name, new DotNettyMessageHandlerFactory(bootstrapChannel, clientWait));
+            var tcpClient = new SocketClient(option.Name, new DotNettyMessageHandlerProvider(bootstrapChannel, clientWait));
+            this._logger.LogInformation($"Create new client channel:{ bootstrapChannel}");
 
             return tcpClient;
         }
@@ -70,8 +66,6 @@ namespace Argo
         {
             private readonly IServiceProvider _serviceProvider;
             private readonly bool _autoRelease;
-
-            public IServiceProvider ServiceProvider => _serviceProvider;
 
             public ReceiverHandler(IServiceProvider serviceProvider, bool autoRelease)
             {
@@ -119,16 +113,12 @@ namespace Argo
             private readonly bool _autoRelease;
             private ClientWaits _clientWaits;
 
-            public IServiceProvider ServiceProvider => _serviceProvider;
-
             public SyncReceiverHandler(IServiceProvider serviceProvider, bool autoRelease)
             {
                 this._serviceProvider = serviceProvider;
                 this._autoRelease = autoRelease;
                 _clientWaits = serviceProvider.GetRequiredService<ClientWaits>();
             }
-
-            bool AcceptInboundMessage(object msg) => msg is IMessage;
 
             public override void ChannelInactive(IChannelHandlerContext context)
             {
@@ -137,13 +127,13 @@ namespace Argo
 
             public override void ChannelRead(IChannelHandlerContext context, object msg)
             {
+
                 bool release = true;
                 try
                 {
-                    if (this.AcceptInboundMessage(msg))
+                    if (msg is IMessage message && message.Sequence == 0)
                     {
-                        var message = (IMessage)msg;
-                        _clientWaits.Set(context.Channel.Id.AsShortText(), message);
+                        _clientWaits.Set(context.Channel.Id.ToString(), message);
                     }
                     else
                     {
@@ -158,6 +148,7 @@ namespace Argo
                         ReferenceCountUtil.Release(msg);
                     }
                 }
+
             }
 
             public override void ChannelReadComplete(IChannelHandlerContext context) => context.Flush();

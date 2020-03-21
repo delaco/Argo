@@ -13,7 +13,7 @@ namespace Argo.Internal
               where T : IMessage
     {
         private IServiceProvider _serviceProvider;
-        //private SessionContainer<ISession> _sessionContainer;
+        private SessionContainer<Session> _sessionContainer;
         private IMessageRouter _messageRouter;
         private readonly bool _autoRelease;
         private ILogger _logger;
@@ -23,7 +23,7 @@ namespace Argo.Internal
 
         public SocketServerHandler(IServiceProvider serviceProvider, bool autoRelease)
         {
-            //this._sessionContainer = serviceProvider.GetRequiredService<SessionContainer<ISession>>();
+            this._sessionContainer = serviceProvider.GetRequiredService<SessionContainer<Session>>();
 
             this._messageRouter = serviceProvider.GetRequiredService<IMessageRouter>();
             this._commandContainer = serviceProvider.GetRequiredService<ICommandDescriptorContainer>();
@@ -34,25 +34,23 @@ namespace Argo.Internal
             _logger = loggerFactory.CreateLogger<SocketServerHandler<T>>();
         }
 
-        //ToDo:
-        public bool AcceptInboundMessage(object msg) => msg is IMessage;
-
         public override void ChannelActive(IChannelHandlerContext context)
         {
+            _logger.LogInformation($"A new connection from:{context.Channel.LocalAddress}");
             base.ChannelActive(context);
 
             var channel = context.Channel;
             var session = new Session();
-            session.Initialize(channel.RemoteAddress, new DotNettyMessageHandlerFactory(channel, null));
+            session.Initialize(channel.RemoteAddress, new DotNettyMessageHandlerProvider(channel, null));
 
             context.Channel.GetAttribute(SessionKey).Set(session);
-            //this._sessionContainer.Set(channel.Id.ToString(), session);
+            this._sessionContainer.Set(channel.Id.ToString(), session);
         }
 
         public override void ChannelInactive(IChannelHandlerContext context)
         {
             base.ChannelInactive(context);
-            //this._sessionContainer.Remove(context.Channel.Id.ToString());
+            this._sessionContainer.Remove(context.Channel.Id.ToString());
         }
 
         public override void UserEventTriggered(IChannelHandlerContext context, object evt)
@@ -75,20 +73,20 @@ namespace Argo.Internal
 
         public override void ChannelRead(IChannelHandlerContext context, object msg)
         {
+            var channel = context.Channel;
             bool release = true;
             try
             {
-                if (this.AcceptInboundMessage(msg))
+                if (msg is IMessage message)
                 {
-                    _logger.LogInformation($"The msg {msg} has been read.");
-                    var message = (MessagePacket)msg;
+                    _logger.LogInformation($"The msg {msg} from {channel} has been read.");
                     var session = context.Channel.GetAttribute(SessionKey).Get();
                     var requestContext = new RequestContext(session, message);
                     _messageRouter.Route(requestContext);
                 }
                 else
                 {
-                    _logger.LogInformation($"The msg {msg} is not type of MessageBase.");
+                    _logger.LogInformation($"The msg {msg} is not type of IMessage.");
                     release = false;
                     context.FireChannelRead(msg);
                 }

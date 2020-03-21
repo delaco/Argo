@@ -1,9 +1,11 @@
 ﻿using Argo.AssemblyParts;
 using Argo.Commands;
+using Argo.Internal;
 using Argo.Utils;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.ObjectPool;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -53,9 +55,9 @@ namespace Argo
         {
             serviceCollection.Configure<RemoteOptions>(config);
             serviceCollection.AddSingleton<ClientWaits>();
-            serviceCollection.AddSingleton<ClientObject>();
-            serviceCollection.AddSingleton<IMessageHandlerFactory, DotNettyMessageHandlerFactory>();
+            serviceCollection.AddSingleton<IMessageHandlerProvider, DotNettyMessageHandlerProvider>();
             serviceCollection.AddSingleton<ISocketClientProvider, DottNettyClientAdapter>();
+            serviceCollection.AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>();
             serviceCollection.AddSingleton<ISocketClientPoolContainer, SocketClientPoolContainer>();
             return serviceCollection;
         }

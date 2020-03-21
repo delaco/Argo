@@ -7,8 +7,5 @@ namespace Argo
     /// </summary>
     public class FrontendSession : Session
     {
-        public string UserId { get; }
-
-        public EndPoint ConnectionAddress { get; }
     }
 }

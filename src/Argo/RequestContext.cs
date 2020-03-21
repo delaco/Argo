@@ -2,14 +2,14 @@
 {
     public class RequestContext
     {
-        private MessagePacket _message;
+        private IMessage _message;
         private Session _session;
 
         /// <summary>
-        /// Gets the message pack
+        /// Gets the message
         /// </summary>
         /// <returns></returns>
-        public MessagePacket Message => _message;
+        public IMessage Message => _message;
 
         /// <summary>
         /// Gets the session
@@ -17,7 +17,7 @@
         /// <returns></returns>
         public Session Session => _session;
 
-        public RequestContext(Session session, MessagePacket message)
+        public RequestContext(Session session, IMessage message)
         {
             this._session = session;
             this._message = message;

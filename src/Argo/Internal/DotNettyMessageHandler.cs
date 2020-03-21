@@ -1,14 +1,19 @@
 ﻿using DotNetty.Transport.Channels;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
-namespace Argo
+namespace Argo.Internal
 {
-    public class DotNettyMessageHandler : IMessageHandler
+    internal class DotNettyMessageHandler : IMessageHandler
     {
-        private bool disposedValue = false;
+        public AutoResetEvent AutoResetEvent = new AutoResetEvent(false);
+
         private IChannel _channel;
         private ClientWaits _clientWait;
+
+        public IMessage Response { get; set; }
+
         internal DotNettyMessageHandler(IChannel channel, ClientWaits clientWait)
         {
             this._channel = channel ?? throw new ArgumentNullException(nameof(channel));
@@ -20,37 +25,35 @@ namespace Argo
             await _channel.WriteAndFlushAsync(message);
         }
 
-        public IMessage Send(IMessage message)
+        public Task<IMessage> Send(IMessage message)
         {
-            var key = _channel.Id.AsShortText();
-            _clientWait.Start(key);
-            _channel.WriteAndFlushAsync(message);
-            var resp = _clientWait.Wait(key).Response;
+            return Task.Run(() =>
+            {
+                this.Response = null;
+                var key = _channel.Id.ToString();
+                _clientWait.Start(key, this);
+                _channel.WriteAndFlushAsync(message);
+                _clientWait.Wait(key);
 
-            return resp;
+                if (this.Response == null)
+                {
+                    throw new TimeoutException($"Send to remote server timeout:{_channel}");
+                }
+
+                return this.Response;
+            });
         }
 
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposedValue)
+            if (disposing)
             {
-                if (disposing)
-                {
-                }
-
                 if (_channel != null)
                 {
                     _channel.CloseAsync().GetAwaiter().GetResult();
                     _channel = null;
                 }
-
-                disposedValue = true;
             }
-        }
-
-        ~DotNettyMessageHandler()
-        {
-            Dispose(false);
         }
 
         public void Dispose()
