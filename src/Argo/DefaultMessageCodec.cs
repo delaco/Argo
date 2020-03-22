@@ -18,15 +18,13 @@ namespace Argo.Internal
 
         public int HeaderLenght { get; }
 
-        public DefaultMessageCodec(
-            int commandFieldOffset = 0,
+        public DefaultMessageCodec(int commandFieldOffset = 0,
             int commandFieldLength = 4,
             int sequenceFieldOffset = 6,
             int sequenceFieldLength = 4,
             int lengthFieldOffset = 10,
             int lengthFieldLength = 4,
-            int headerLenght = 14
-            )
+            int headerLenght = 14)
         {
             CommandFieldOffset = commandFieldOffset;
             CommandFieldLength = commandFieldLength;
@@ -39,9 +37,9 @@ namespace Argo.Internal
 
         public virtual IMessage Decode(Span<byte> byteBuffer)
         {
-            var command = GetFrameLength(byteBuffer, CommandFieldOffset, CommandFieldLength);
-            var sequence = GetFrameLength(byteBuffer, SequenceFieldOffset, SequenceFieldLength);
-            var bodyLength = GetFrameLength(byteBuffer, LengthFieldOffset, LengthFieldLength);
+            var command = GetFrameValue(byteBuffer, CommandFieldOffset, CommandFieldLength);
+            var sequence = GetFrameValue(byteBuffer, SequenceFieldOffset, SequenceFieldLength);
+            var bodyLength = GetFrameValue(byteBuffer, LengthFieldOffset, LengthFieldLength);
             var bodyBuffer = byteBuffer.Slice(HeaderLenght, (int)bodyLength);
 
             return new MessagePacket((int)command, (int)sequence, bodyBuffer.ToArray());
@@ -68,7 +66,7 @@ namespace Argo.Internal
             return resultBuffer;
         }
 
-        protected virtual long GetFrameLength(Span<byte> byteBuffer, int fieldOffset, int fieldlength)
+        protected virtual long GetFrameValue(Span<byte> byteBuffer, int fieldOffset, int fieldlength)
         {
             var frameLength = fieldlength switch
             {
