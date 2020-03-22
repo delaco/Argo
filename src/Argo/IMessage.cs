@@ -1,4 +1,6 @@
-﻿namespace Argo
+﻿using System;
+
+namespace Argo
 {
     public interface IMessage
     {
@@ -6,10 +8,6 @@
 
         int Sequence { get; }
 
-        short Option { get; }
-
-        byte[] Body { get; }
-
-        byte[] Content { get; }
+        Span<byte> Body { get; }
     }
 }

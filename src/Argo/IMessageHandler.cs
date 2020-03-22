@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Argo
@@ -21,5 +22,12 @@ namespace Argo
         /// <param name="message"></param>
         /// <returns></returns>
         Task<IMessage> Send(IMessage message);
+
+        /// <summary>
+        /// Asysc response data
+        /// </summary>
+        IMessage AyscResponse { get; set; }
+
+        AutoResetEvent AutoResetEvent { get; }
     }
 }

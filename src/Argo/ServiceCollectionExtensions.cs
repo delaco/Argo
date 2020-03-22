@@ -16,7 +16,7 @@ namespace Argo
     {
         public static IServiceCollection AddCommands(this IServiceCollection services,
             AssemblyPartManager assemblyPartManager,
-            NetListenerOptions netListenerOptions)
+            ListenerOptions netListenerOptions)
         {
             var commandAssemblies = new List<Assembly>();
             if (netListenerOptions.CommandAssemblies != null && netListenerOptions.CommandAssemblies.Any())

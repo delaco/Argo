@@ -7,6 +7,7 @@ using DotNetty.Transport.Bootstrapping;
 using DotNetty.Transport.Channels;
 using DotNetty.Transport.Channels.Sockets;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
 using System.Net.Sockets;
@@ -17,15 +18,17 @@ namespace Argo.Internal
 {
     internal class DotNettyListenerAdapter : INetListener
     {
-        private NetListenerOptions _options;
+        private ListenerOptions _options;
         private IServiceProvider _serviceProvider;
         private IChannel _boundChannel;
+        private IMessageCodec _messageCodec;
 
-        public DotNettyListenerAdapter(NetListenerOptions options, IServiceProvider serviceProvider)
+        public DotNettyListenerAdapter(ListenerOptions options, IServiceProvider serviceProvider)
         {
             _options = options;
             _serviceProvider = serviceProvider;
-            InternalLoggerFactory.DefaultFactory = _serviceProvider.GetService<Microsoft.Extensions.Logging.ILoggerFactory>();
+            InternalLoggerFactory.DefaultFactory = _serviceProvider.GetService<ILoggerFactory>();
+            _messageCodec = _serviceProvider.GetRequiredService<IMessageCodec>();
         }
 
         public async Task StartListenerAsync()
@@ -56,14 +59,14 @@ namespace Argo.Internal
                        pipeline.AddLast(new IdleStateHandler(TimeSpan.FromHours(8), TimeSpan.FromHours(8), TimeSpan.FromHours(8)));
                        if (_options.SocketMode == SocketMode.Socket)
                        {
-                           pipeline.AddLast("framing-enc", new HeaderPrepender());
-                           pipeline.AddLast("framing-dec", new HeaderBasedFrameDecoder());
+                           pipeline.AddLast("framing-enc", new DotNettyMessageEncoder(_messageCodec));
+                           pipeline.AddLast("framing-dec", new DotNettyMessageDecoder(_messageCodec));
                            pipeline.AddLast(new SocketServerHandler<MessagePacket>(_serviceProvider, true));
                        }
                        else // websocket support
                        {
                            pipeline.AddLast(new HttpServerCodec());
-                           pipeline.AddLast("framing-enc", new WebSocketHeaderPrepender());
+                           pipeline.AddLast("framing-enc", new DotNettyMessageWebSocketEncoder(_messageCodec));
                            pipeline.AddLast(new HttpObjectAggregator(65536));
                            pipeline.AddLast(new WebSocketServerHandler(_serviceProvider, _options));
                        }

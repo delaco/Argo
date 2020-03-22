@@ -7,12 +7,12 @@ namespace Argo.Internal
 {
     internal class DotNettyMessageHandler : IMessageHandler
     {
-        public AutoResetEvent AutoResetEvent = new AutoResetEvent(false);
-
         private IChannel _channel;
         private ClientWaits _clientWait;
 
-        public IMessage Response { get; set; }
+        public IMessage AyscResponse { get; set; }
+
+        AutoResetEvent IMessageHandler.AutoResetEvent => new AutoResetEvent(false);
 
         internal DotNettyMessageHandler(IChannel channel, ClientWaits clientWait)
         {
@@ -29,18 +29,18 @@ namespace Argo.Internal
         {
             return Task.Run(() =>
             {
-                this.Response = null;
+                this.AyscResponse = null;
                 var key = _channel.Id.ToString();
                 _clientWait.Start(key, this);
                 _channel.WriteAndFlushAsync(message);
                 _clientWait.Wait(key);
 
-                if (this.Response == null)
+                if (this.AyscResponse == null)
                 {
                     throw new TimeoutException($"Send to remote server timeout:{_channel}");
                 }
 
-                return this.Response;
+                return this.AyscResponse;
             });
         }
 

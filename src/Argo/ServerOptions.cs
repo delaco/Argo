@@ -3,12 +3,12 @@ using System.Net.Sockets;
 
 namespace Argo
 {
-    public class NetServerOptions
+    public class ServerOptions
     {
-        public List<NetListenerOptions> ListenerOptions { get; set; }
+        public List<ListenerOptions> Listeners { get; set; }
     }
 
-    public class NetListenerOptions
+    public class ListenerOptions
     {
         public SocketMode SocketMode { get; set; }
 

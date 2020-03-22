@@ -12,11 +12,11 @@ namespace Argo
     public class NetListenerService : IHostedService
     {
         private List<INetListener> _netListeners;
-        private NetServerOptions _options;
+        private ServerOptions _options;
         private INetListenerProvider _netListenerFactory;
         private ILogger _logger;
 
-        public NetListenerService(IOptions<NetServerOptions> options,
+        public NetListenerService(IOptions<ServerOptions> options,
             INetListenerProvider netListenerFactory,
             ILoggerFactory loggerFactory)
         {
@@ -34,7 +34,7 @@ namespace Argo
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            foreach (var opt in _options.ListenerOptions)
+            foreach (var opt in _options.Listeners)
             {
                 var netListener = _netListenerFactory.CreateListener(opt);
                 _netListeners.Add(netListener);

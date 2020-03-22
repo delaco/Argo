@@ -26,12 +26,12 @@ namespace Argo
 
         public IMessageHandler MessageHandler => _messageHandler;
 
-        public virtual void Initialize(EndPoint remoteAddress, IMessageHandlerProvider messageHandlerFactory)
+        public virtual void Initialize(EndPoint remoteAddress, IMessageHandler messageHandler)
         {
             _sessionId = Guid.NewGuid().ToString();
             _createTime = DateTime.Now;
             _remoteAddress = remoteAddress;
-            _messageHandler = messageHandlerFactory.Create();
+            _messageHandler = messageHandler;
         }
 
         public async Task SendAsync(IMessage message)

@@ -1,4 +1,5 @@
-﻿using DotNetty.Transport.Channels;
+﻿using Argo.Internal;
+using DotNetty.Transport.Channels;
 
 namespace Argo.Internal
 {

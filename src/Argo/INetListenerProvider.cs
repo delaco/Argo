@@ -5,6 +5,6 @@
     /// </summary>
     public interface INetListenerProvider
     {
-        INetListener CreateListener(NetListenerOptions options);
+        INetListener CreateListener(ListenerOptions options);
     }
 }

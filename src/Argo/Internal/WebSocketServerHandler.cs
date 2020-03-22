@@ -26,10 +26,11 @@ namespace Argo.Internal
         private ICommandDescriptorContainer _commandContainer;
         private WebSocketServerHandshaker _handshaker;
         private ICommandActivator _commandActivator;
-        private NetListenerOptions _netListenerOptions;
+        private ListenerOptions _netListenerOptions;
+        private IMessageCodec _messageCodec;
         private ILogger _logger;
 
-        public WebSocketServerHandler(IServiceProvider serviceProvider, NetListenerOptions netListenerOptions)
+        public WebSocketServerHandler(IServiceProvider serviceProvider, ListenerOptions netListenerOptions)
         {
             this._sessionContainer = serviceProvider.GetRequiredService<SessionContainer<Session>>();
             this._serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
@@ -37,6 +38,7 @@ namespace Argo.Internal
 
             this._commandContainer = serviceProvider.GetRequiredService<ICommandDescriptorContainer>();
             this._commandActivator = serviceProvider.GetRequiredService<ICommandActivator>();
+            this._messageCodec = serviceProvider.GetRequiredService<IMessageCodec>();
             ILoggerFactory loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
             _logger = loggerFactory.CreateLogger<WebSocketServerHandler>();
         }
@@ -84,7 +86,8 @@ namespace Argo.Internal
                 _logger.LogInformation($"New client to handshake:{ctx.Channel}");
                 var channel = ctx.Channel;
                 var session = new Session();
-                session.Initialize(channel.RemoteAddress, new DotNettyMessageHandlerProvider(channel, null));
+                var messageHandler = new DotNettyMessageHandlerProvider(channel, null).Create();
+                session.Initialize(channel.RemoteAddress, messageHandler);
 
                 ctx.Channel.GetAttribute(SessionKey).Set(session);
                 this._sessionContainer.Set(channel.Id.ToString(), session);
@@ -115,15 +118,9 @@ namespace Argo.Internal
         void HandleBinaryWebSocketFrame(IChannelHandlerContext context, BinaryWebSocketFrame binaryWebSocketFrame)
         {
             var byteBuffer = binaryWebSocketFrame.Content;
-            var cmd = GetFrameValue(byteBuffer, 0, 4);
-            var opt = GetFrameValue(byteBuffer, 4, 2);
-            var seq = GetFrameValue(byteBuffer, 6, 4);
-
-            var bodyBuff = byteBuffer.SkipBytes(14);
-            var body = new byte[bodyBuff.ReadableBytes];
-            bodyBuff.ReadBytes(body);
-
-            var message = new MessagePacket((int)cmd, (short)opt, (int)seq, body);
+            var readBytes = new byte[byteBuffer.ReadableBytes];
+            byteBuffer.ReadBytes(readBytes);
+            var message =_messageCodec.Decode(readBytes);
 
             var session = context.Channel.GetAttribute(SessionKey).Get();
             session.LastAccessTime = DateTime.Now;

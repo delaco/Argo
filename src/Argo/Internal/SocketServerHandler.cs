@@ -41,7 +41,8 @@ namespace Argo.Internal
 
             var channel = context.Channel;
             var session = new Session();
-            session.Initialize(channel.RemoteAddress, new DotNettyMessageHandlerProvider(channel, null));
+            var messageHandler = new DotNettyMessageHandlerProvider(channel, null).Create();
+            session.Initialize(channel.RemoteAddress, messageHandler);
 
             context.Channel.GetAttribute(SessionKey).Set(session);
             this._sessionContainer.Set(channel.Id.ToString(), session);

@@ -8,65 +8,32 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Argo.Net
+namespace Argo.Internal
 {
-    internal class HeaderPrepender : MessageToMessageEncoder<MessagePacket>
+    internal class DotNettyMessageEncoder : MessageToMessageEncoder<IMessage>
     {
-        private readonly ByteOrder _byteOrder;
-        private readonly int _lengthFieldLength;
+        private IMessageCodec _messageCodec;
 
-        public HeaderPrepender()
+        public DotNettyMessageEncoder(IMessageCodec messageCodec)
         {
-            _byteOrder = ByteOrder.LittleEndian;
-            _lengthFieldLength = 4;
+            _messageCodec = messageCodec;
         }
 
-        protected override void Encode(IChannelHandlerContext context, MessagePacket message, List<object> output)
+        protected override void Encode(IChannelHandlerContext context, IMessage message, List<object> output)
         {
-            int length = message.Body.Length;
+            var bytes = _messageCodec.Encode(message);
 
-            if (length < 0)
-            {
-                throw new ArgumentException($"Adjusted frame length ({ length }) is less than zero");
-            }
-
-            output.Add(context.Allocator.Buffer(4).WriteIntLE(message.Command));
-            output.Add(context.Allocator.Buffer(2).WriteShortLE(message.Option));
-            output.Add(context.Allocator.Buffer(4).WriteIntLE(message.Sequence));
-
-            switch (this._lengthFieldLength)
-            {
-                case 1:
-                    if (length > byte.MaxValue)
-                    {
-                        throw new ArgumentException("length of object does not fit into one byte: " + length);
-                    }
-
-                    output.Add(context.Allocator.Buffer(1).WriteByte((byte)length));
-                    break;
-                case 2:
-                    if (length > ushort.MaxValue)
-                    {
-                        throw new ArgumentException("length of object does not fit into a short integer: " + length);
-                    }
-
-                    output.Add(context.Allocator.Buffer(2).WriteShortLE((ushort)length));
-                    break;
-                case 4:
-                    output.Add(context.Allocator.Buffer(4).WriteIntLE(length));
-                    break;
-                default:
-                    throw new Exception("Unknown length field length");
-            }
-
-
-            IByteBuffer byteBuffer = Unpooled.CopiedBuffer(message.Body);
+            IByteBuffer byteBuffer = Unpooled.CopiedBuffer(bytes.ToArray());
             output.Add(byteBuffer.Retain());
         }
     }
 
-    internal class WebSocketHeaderPrepender : HeaderPrepender
+    internal class DotNettyMessageWebSocketEncoder : DotNettyMessageEncoder
     {
+        public DotNettyMessageWebSocketEncoder(IMessageCodec messageCodec) : base(messageCodec)
+        {
+        }
+
         public override Task WriteAsync(IChannelHandlerContext ctx, object msg)
         {
             Task result;

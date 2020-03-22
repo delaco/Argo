@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Net;
 using System.Net.Sockets;
+using Argo.Internal;
 
 namespace Argo.Internal
 {
@@ -15,17 +16,18 @@ namespace Argo.Internal
     {
         private ILogger<DottNettyClientAdapter> _logger;
         private IServiceProvider _serviceProvider;
+        private IMessageCodec _messageCodec;
 
         public DottNettyClientAdapter(ILogger<DottNettyClientAdapter> logger, IServiceProvider serviceProvider)
         {
             this._logger = logger;
             _serviceProvider = serviceProvider;
+            _messageCodec = _serviceProvider.GetRequiredService<IMessageCodec>();
         }
 
         public SocketClient Create(SocketClientOptions option)
         {
             var group = new MultithreadEventLoopGroup();
-
 
             Bootstrap bootstrap;
             if (option.ProtocolType == ProtocolType.Tcp)
@@ -39,8 +41,8 @@ namespace Argo.Internal
                    {
                        IChannelPipeline pipeline = channel.Pipeline;
                        pipeline.AddLast(new LoggingHandler("CONN"));
-                       pipeline.AddLast("framing-enc", new HeaderPrepender());
-                       pipeline.AddLast("framing-dec", new HeaderBasedFrameDecoder());
+                       pipeline.AddLast("framing-enc", new DotNettyMessageEncoder(_messageCodec));
+                       pipeline.AddLast("framing-dec", new DotNettyMessageDecoder(_messageCodec));
                        pipeline.AddLast(new SyncReceiverHandler<IMessage>(_serviceProvider, true));
                        pipeline.AddLast(new ReceiverHandler<IMessage>(_serviceProvider, true));
                    }));

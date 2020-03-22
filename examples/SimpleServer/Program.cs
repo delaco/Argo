@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace SimpleServer
 {
@@ -18,6 +19,7 @@ namespace SimpleServer
                 .UseArgo(config)
                 .ConfigureServices((service) =>
                 {
+                    service.AddSingleton<IMessageCodec, CustomMessageCodec>();
                     service.AddSocketClient(config);
                 })
                 .ConfigureLogging((loggingBuilder) =>

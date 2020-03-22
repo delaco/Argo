@@ -21,15 +21,16 @@ namespace Argo
                 services.AddSingleton<ITypeActivatorCache, TypeActivatorCache>();
                 services.AddSingleton<IPassThroughRuleProvider, PassThroughRuleProvider>();
                 services.AddSingleton<IMessageRouter, MessageRouter>();
-                services.Configure<NetServerOptions>(config);
-                services.AddSingleton<INetListenerProvider, NetListenerProvider>();
+                services.Configure<ServerOptions>(config);
+                services.AddSingleton<IMessageCodec, DefaultMessageCodec>();
+                services.AddSingleton<INetListenerProvider, DotNettyListenerProvider>();
                 var sessionContainer = new SessionContainer<Session>();
                 services.AddSingleton(sessionContainer);
                 services.AddSingleton<IHostedService, NetListenerService>();
-                var options = ConfigurationBinder.Get<NetServerOptions>(config);
-                if (options != null && options.ListenerOptions.Any())
+                var options = ConfigurationBinder.Get<ServerOptions>(config);
+                if (options != null && options.Listeners.Any())
                 {
-                    options.ListenerOptions.ForEach(op =>
+                    options.Listeners.ForEach(op =>
                     {
                         services.AddCommands(partManager, op);
                     });

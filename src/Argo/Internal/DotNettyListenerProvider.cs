@@ -1,13 +1,13 @@
 ﻿using Argo.Internal;
 using System;
 
-namespace Argo
+namespace Argo.Internal
 {
-    public class NetListenerProvider : INetListenerProvider
+    public class DotNettyListenerProvider : INetListenerProvider
     {
         private IServiceProvider _serviceProvider;
 
-        public NetListenerProvider(IServiceProvider serviceProvider)
+        public DotNettyListenerProvider(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         }
@@ -17,7 +17,7 @@ namespace Argo
         /// </summary>
         /// <param name="options"></param>
         /// <returns></returns>
-        public INetListener CreateListener(NetListenerOptions options)
+        public INetListener CreateListener(ListenerOptions options)
         {
             return new DotNettyListenerAdapter(options, _serviceProvider);
         }
