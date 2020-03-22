@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
 
 namespace Argo
 {
@@ -7,19 +7,19 @@ namespace Argo
     {
         public SessionContainer()
         {
-            Members = new Dictionary<string, T>();
+            Members = new ConcurrentDictionary<string, T>();
         }
 
-        public IDictionary<string, T> Members { get; private set; }
+        public ConcurrentDictionary<string, T> Members { get; private set; }
 
-        public T this[string index]
+        public T this[string id]
         {
-            get { return Members[index]; }
+            get { return Members[id]; }
         }
 
-        public bool Contains(string index)
+        public bool Contains(string id)
         {
-            return Members.ContainsKey(index);
+            return Members.ContainsKey(id);
         }
 
         public void Set(string index, T value)
@@ -35,9 +35,9 @@ namespace Argo
             return default;
         }
 
-        public void Remove(string index)
+        public void Remove(string id)
         {
-            Members.Remove(index);
+            Members.TryRemove(id, out _);
         }
     }
 }

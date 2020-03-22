@@ -97,6 +97,8 @@ namespace Argo.Internal
 
         void HandleWebSocketFrame(IChannelHandlerContext ctx, WebSocketFrame frame)
         {
+            var session = _sessionContainer.Get(ctx.Channel.ToString());
+            session.LastAccessTime = DateTime.Now;
             switch (frame)
             {
                 // Check for closing frame
@@ -110,19 +112,18 @@ namespace Argo.Internal
                     ctx.WriteAsync(frame.Retain());
                     return;
                 case BinaryWebSocketFrame _:
-                    HandleBinaryWebSocketFrame(ctx, (BinaryWebSocketFrame)frame.Retain());
+                    HandleBinaryWebSocketFrame(ctx, (BinaryWebSocketFrame)frame.Retain(), session);
                     return;
             }
         }
 
-        void HandleBinaryWebSocketFrame(IChannelHandlerContext context, BinaryWebSocketFrame binaryWebSocketFrame)
+        void HandleBinaryWebSocketFrame(IChannelHandlerContext context, BinaryWebSocketFrame binaryWebSocketFrame, Session session)
         {
             var byteBuffer = binaryWebSocketFrame.Content;
             var readBytes = new byte[byteBuffer.ReadableBytes];
             byteBuffer.ReadBytes(readBytes);
-            var message =_messageCodec.Decode(readBytes);
+            var message = _messageCodec.Decode(readBytes);
 
-            var session = context.Channel.GetAttribute(SessionKey).Get();
             session.LastAccessTime = DateTime.Now;
             var requestContext = new RequestContext(session, message);
             var commandDescriptor = _commandContainer.Get(requestContext);

@@ -74,6 +74,8 @@ namespace Argo.Internal
 
         public override void ChannelRead(IChannelHandlerContext context, object msg)
         {
+            var session = _sessionContainer.Get(context.Channel.ToString());
+            session.LastAccessTime = DateTime.Now;
             var channel = context.Channel;
             bool release = true;
             try
@@ -81,7 +83,6 @@ namespace Argo.Internal
                 if (msg is IMessage message)
                 {
                     _logger.LogInformation($"The msg {msg} from {channel} has been read.");
-                    var session = context.Channel.GetAttribute(SessionKey).Get();
                     var requestContext = new RequestContext(session, message);
                     _messageRouter.Route(requestContext);
                 }
