@@ -1,4 +1,6 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 
 namespace Argo
 {
@@ -33,6 +35,23 @@ namespace Argo
                 return data;
 
             return default;
+        }
+
+        public IEnumerable<T> Find(Predicate<T> critera = null)
+        {
+            var enumerator = Members.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                var s = enumerator.Current.Value;
+
+                /* todo:
+                if (s.State != SessionState.Connected)
+                    continue;
+                */
+
+                if (critera == null || critera(s))
+                    yield return s;
+            }
         }
 
         public void Remove(string id)

@@ -11,8 +11,10 @@ namespace SimpleServer.Commands
 
         public TestCommond(ILogger<TestCommond> logger)
         {
-            this._logger = logger;
+            this.Logger = logger;
         }
+
+        public ILogger<TestCommond> Logger { get => _logger; set => _logger = value; }
 
         public void Execute(RequestContext requestContext)
         {

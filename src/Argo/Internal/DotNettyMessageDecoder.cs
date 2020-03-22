@@ -22,7 +22,7 @@ namespace Argo.Internal
 
         protected override object Decode(IChannelHandlerContext context, IByteBuffer input)
         {
-            if (base.Decode(context, input) is IByteBuffer byteBuffer)
+            if (base.Decode(context, input) is IByteBuffer)
             {
                 var bytes = new byte[input.ReadableBytes];
                 input.ReadBytes(bytes);

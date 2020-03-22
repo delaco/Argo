@@ -1,5 +1,4 @@
-﻿using Argo.Internal;
-using System;
+﻿using System;
 
 namespace Argo.Commands
 {
@@ -12,12 +11,7 @@ namespace Argo.Commands
 
         public DefaultCommandActivator(ITypeActivatorCache typeActivatorCache)
         {
-            if (typeActivatorCache == null)
-            {
-                throw new ArgumentNullException(nameof(typeActivatorCache));
-            }
-
-            _typeActivatorCache = typeActivatorCache;
+            _typeActivatorCache = typeActivatorCache ?? throw new ArgumentNullException(nameof(typeActivatorCache));
         }
 
         public virtual object Create(CommandContext commandContext)
@@ -57,7 +51,7 @@ namespace Argo.Commands
                 throw new ArgumentNullException(nameof(command));
             }
 
-            var disposable = command as IDisposable;
+            IDisposable disposable = command as IDisposable;
             if (disposable != null)
             {
                 disposable.Dispose();

@@ -68,6 +68,8 @@ namespace Argo.Internal
             private readonly IServiceProvider _serviceProvider;
             private readonly bool _autoRelease;
 
+            public IServiceProvider ServiceProvider => _serviceProvider;
+
             public ReceiverHandler(IServiceProvider serviceProvider, bool autoRelease)
             {
                 this._serviceProvider = serviceProvider;
@@ -120,6 +122,8 @@ namespace Argo.Internal
                 this._autoRelease = autoRelease;
                 _clientWaits = serviceProvider.GetRequiredService<ClientWaits>();
             }
+
+            public IServiceProvider ServiceProvider => _serviceProvider;
 
             public override void ChannelInactive(IChannelHandlerContext context)
             {

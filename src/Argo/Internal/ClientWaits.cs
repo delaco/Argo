@@ -48,7 +48,7 @@ namespace Argo.Internal
             if (_waits.TryGetValue(key, out IMessageHandler messageHandler))
             {
                 messageHandler.AutoResetEvent.WaitOne(TimeSpan.FromSeconds(5));
-                _waits.TryRemove(key, out IMessageHandler nettyMessageHandler);
+                _waits.TryRemove(key, out _);
             }
             else
             {

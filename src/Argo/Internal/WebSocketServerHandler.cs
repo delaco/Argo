@@ -117,7 +117,7 @@ namespace Argo.Internal
             }
         }
 
-        void HandleBinaryWebSocketFrame(IChannelHandlerContext context, BinaryWebSocketFrame binaryWebSocketFrame, Session session)
+        private void HandleBinaryWebSocketFrame(IChannelHandlerContext context, BinaryWebSocketFrame binaryWebSocketFrame, Session session)
         {
             var byteBuffer = binaryWebSocketFrame.Content;
             var readBytes = new byte[byteBuffer.ReadableBytes];
@@ -143,33 +143,6 @@ namespace Argo.Internal
             {
                 _logger.LogWarning($"The msg' command {byteBuffer} was not found.");
             }
-        }
-
-        static long GetFrameValue(IByteBuffer buffer, int offset, int length)
-        {
-            long frameLength;
-            switch (length)
-            {
-                case 1:
-                    frameLength = buffer.GetByte(offset);
-                    break;
-                case 2:
-                    frameLength = buffer.GetUnsignedShortLE(offset);
-                    break;
-                case 3:
-                    frameLength = buffer.GetUnsignedMediumLE(offset);
-                    break;
-                case 4:
-                    frameLength = buffer.GetIntLE(offset);
-                    break;
-                case 8:
-                    frameLength = buffer.GetLongLE(offset);
-                    break;
-                default:
-                    throw new DecoderException("unsupported lengthFieldLength: " + length + " (expected: 1, 2, 3, 4, or 8)");
-            }
-
-            return frameLength;
         }
 
         static void SendHttpResponse(IChannelHandlerContext ctx, IFullHttpRequest req, IFullHttpResponse res)
