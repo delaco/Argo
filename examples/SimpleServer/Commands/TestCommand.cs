@@ -18,13 +18,13 @@ namespace SimpleServer.Commands
 
         public void Execute(RequestContext requestContext)
         {
-            var ret = this.ExecuteCore(requestContext.Message);
+            var ret = this.ExecuteCore(requestContext.Packet);
             requestContext.Session?.SendAsync(ret);
         }
 
-        internal MessagePacket ExecuteCore(IMessage message)
+        internal PacketInfo ExecuteCore(IPacket message)
         {
-            return new MessagePacket(123, message.Sequence, new byte[] { 1, 2, 3, 4 });
+            return new PacketInfo(1, message.Sequence, new byte[] { 1, 2, 3, 4 });
         }
     }
 }

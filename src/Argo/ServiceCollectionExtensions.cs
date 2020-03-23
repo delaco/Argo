@@ -14,7 +14,7 @@ namespace Argo
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddCommands(this IServiceCollection services,
+        internal static IServiceCollection AddCommands(this IServiceCollection services,
             AssemblyPartManager assemblyPartManager,
             ListenerOptions netListenerOptions)
         {
@@ -53,8 +53,10 @@ namespace Argo
 
         public static IServiceCollection AddSocketClient(this IServiceCollection serviceCollection, IConfiguration config)
         {
-            serviceCollection.Configure<RemoteOptions>(config);
+            var options = ConfigurationBinder.Get<RemoteOptions>(config);
+            serviceCollection.AddSingleton(options);
             serviceCollection.AddSingleton<ClientWaits>();
+            serviceCollection.AddSingleton<IPacketCodec, DefaultPacketCodec>();
             serviceCollection.AddSingleton<IMessageHandlerProvider, DotNettyMessageHandlerProvider>();
             serviceCollection.AddSingleton<ISocketClientProvider, DottNettyClientAdapter>();
             serviceCollection.AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>();

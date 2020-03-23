@@ -34,7 +34,7 @@ namespace Argo
             _messageHandler = messageHandler;
         }
 
-        public async Task SendAsync(IMessage message)
+        public async Task SendAsync(IPacket message)
         {
             await this._messageHandler.SendAsync(message);
         }

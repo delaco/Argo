@@ -6,28 +6,30 @@ namespace Argo.Internal
 {
     internal class DotNettyMessageDecoder : LengthFieldBasedFrameDecoder
     {
-        private IMessageCodec _messageCodec;
+        private IPacketCodec _packetCodec;
 
-        public DotNettyMessageDecoder(IMessageCodec messageCodec)
+        public DotNettyMessageDecoder(IPacketCodec packetCodec)
             : base(ByteOrder.LittleEndian,
                   ushort.MaxValue,
-                  messageCodec.LengthFieldOffset,
-                  messageCodec.LengthFieldLength,
-                  messageCodec.HeaderLenght - messageCodec.LengthFieldOffset - messageCodec.LengthFieldLength,
+                  packetCodec.LengthFieldOffset,
+                  packetCodec.LengthFieldLength,
+                  packetCodec.HeaderLenght - packetCodec.LengthFieldOffset - packetCodec.LengthFieldLength,
                   0,
                   true)
         {
-            _messageCodec = messageCodec;
+            _packetCodec = packetCodec;
         }
 
         protected override object Decode(IChannelHandlerContext context, IByteBuffer input)
         {
-            if (base.Decode(context, input) is IByteBuffer)
+            if (base.Decode(context, input) is IByteBuffer byteBuffer)
             {
-                var bytes = new byte[input.ReadableBytes];
-                input.ReadBytes(bytes);
+                var bodyLength = base.GetUnadjustedFrameLength(input, _packetCodec.LengthFieldOffset, _packetCodec.LengthFieldLength, ByteOrder.LittleEndian);
+                var bytes = new byte[_packetCodec.HeaderLenght + bodyLength];
 
-                var message = _messageCodec.Decode(bytes);
+                byteBuffer.ReadBytes(bytes);
+
+                var message = _packetCodec.Decode(bytes);
 
                 return message;
             }

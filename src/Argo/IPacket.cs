@@ -2,7 +2,7 @@
 
 namespace Argo
 {
-    public interface IMessage
+    public interface IPacket
     {
         int Command { get; }
 

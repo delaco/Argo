@@ -16,12 +16,12 @@ namespace Argo
             this._messageHandler = messageHandlerFactory.Create();
         }
 
-        public async Task SendAsync(IMessage message)
+        public async Task SendAsync(IPacket message)
         {
             await _messageHandler.SendAsync(message);
         }
 
-        public Task<IMessage> Send(IMessage message)
+        public Task<IPacket> Send(IPacket message)
         {
             return _messageHandler.Send(message);
         }

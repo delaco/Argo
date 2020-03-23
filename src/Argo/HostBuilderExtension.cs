@@ -20,9 +20,9 @@ namespace Argo
                 ConfigureFeatureProviders(partManager);
                 services.AddSingleton<ITypeActivatorCache, TypeActivatorCache>();
                 services.AddSingleton<IPassThroughRuleProvider, PassThroughRuleProvider>();
-                services.AddSingleton<IMessageRouter, MessageRouter>();
+                services.AddSingleton<IMessageRouter, PacketRouter>();
                 services.Configure<ServerOptions>(config);
-                services.AddSingleton<IMessageCodec, DefaultMessageCodec>();
+                services.AddSingleton<IPacketCodec, DefaultPacketCodec>();
                 services.AddSingleton<INetListenerProvider, DotNettyListenerProvider>();
                 var sessionContainer = new SessionContainer<Session>();
                 services.AddSingleton(sessionContainer);

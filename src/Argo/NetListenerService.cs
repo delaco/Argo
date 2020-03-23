@@ -40,7 +40,7 @@ namespace Argo
                 _netListeners.Add(netListener);
                 _logger.LogInformation($"NetListener mode:{opt.SocketMode} port:{opt.Port} starting");
 
-                await netListener?.StartListenerAsync();
+                await netListener?.StartAsync();
             }
         }
 
@@ -50,7 +50,7 @@ namespace Argo
             {
                 _logger.LogInformation($"NetListener stopping");
 
-                await netListener?.CloseListenerAsync();
+                await netListener?.CloseAsync();
             }
         }
     }

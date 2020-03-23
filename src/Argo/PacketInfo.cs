@@ -2,7 +2,7 @@
 
 namespace Argo
 {
-    public class MessagePacket : IMessage
+    public class PacketInfo : IPacket
     {
         private byte[] _body;
         public int Command { get; }
@@ -11,7 +11,7 @@ namespace Argo
 
         public Span<byte> Body => _body;
 
-        public MessagePacket(int command, int sequence, byte[] body)
+        public PacketInfo(int command, int sequence, byte[] body)
         {
             Command = command;
             Sequence = sequence;
@@ -20,7 +20,7 @@ namespace Argo
 
         public override string ToString()
         {
-            return $"{this.GetType().Name}[Command={this.Command},Sequence={this.Sequence},Lenth={Body.Length}]";
+            return $"{GetType().Name}[Command={Command},Sequence={Sequence},Lenth={Body.Length}]";
         }
     }
 }

@@ -14,20 +14,13 @@ namespace Argo
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        Task SendAsync(IMessage message);
+        Task SendAsync(IPacket message);
 
         /// <summary>
         /// Send
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        Task<IMessage> Send(IMessage message);
-
-        /// <summary>
-        /// Asysc response data
-        /// </summary>
-        IMessage AyscResponse { get; set; }
-
-        AutoResetEvent AutoResetEvent { get; }
+        Task<IPacket> Send(IPacket message);
     }
 }

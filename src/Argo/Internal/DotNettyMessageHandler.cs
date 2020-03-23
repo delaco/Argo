@@ -10,9 +10,9 @@ namespace Argo.Internal
         private IChannel _channel;
         private ClientWaits _clientWait;
 
-        public IMessage AyscResponse { get; set; }
+        public IPacket AyscResponse { get; set; }
 
-        AutoResetEvent IMessageHandler.AutoResetEvent => new AutoResetEvent(false);
+        public AutoResetEvent AutoResetEvent = new AutoResetEvent(false);
 
         internal DotNettyMessageHandler(IChannel channel, ClientWaits clientWait)
         {
@@ -20,13 +20,16 @@ namespace Argo.Internal
             this._clientWait = clientWait;
         }
 
-        public async Task SendAsync(IMessage message)
+        public async Task SendAsync(IPacket message)
         {
             await _channel.WriteAndFlushAsync(message);
         }
 
-        public Task<IMessage> Send(IMessage message)
+        public Task<IPacket> Send(IPacket message)
         {
+            if (_clientWait == null)
+                throw new ArgumentNullException(nameof(_clientWait));
+
             return Task.Run(() =>
             {
                 this.AyscResponse = null;
