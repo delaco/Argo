@@ -18,17 +18,16 @@ namespace AdvancedServer.Commands
 
         public void Execute(RequestContext requestContext)
         {
-            var ret = this.ExecuteCore(requestContext.Packet);
+            var ret = ExecuteInternal(requestContext.Packet);
             requestContext.Session?.SendAsync(ret);
         }
 
-        internal PacketInfo ExecuteCore(IPacket packet)
+        internal IPacket ExecuteInternal(IPacket packet)
         {
-            ///var req = Proxy_UserEntryReq.Parser.ParseFrom(packet.Body.ToArray());
-            ///Logger.LogInformation($"The request:{req.UserId}) already processed");A
-
+            var req = Proxy_UserEntryReq.Parser.ParseFrom(packet.Body.ToArray());
+            Logger.LogInformation($"The request:{req.UserId}) already processed");
             Proxy_UserEntryResp resp = new Proxy_UserEntryResp();
-            resp.UserId = 1;
+            resp.UserId = req.UserId;
             resp.Result = new ResponseResult() { Code = 111, Message = "test message" };
 
             return new PacketInfo(packet.Command, packet.Sequence, resp.ToByteArray());
