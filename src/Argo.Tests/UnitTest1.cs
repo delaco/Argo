@@ -12,7 +12,6 @@ namespace Argo.Tests
     [Command(1)]
     public class TestCommond : ICommand
     {
-
         public TestCommond()
         {
 
@@ -52,7 +51,7 @@ namespace Argo.Tests
         }
 
         [Fact]
-        public void Test1()
+        public void SimpleRequestTest()
         {
             var poolContainer = Services.GetRequiredService<ISocketClientPoolContainer>();
             Assert.NotNull(poolContainer);

@@ -1,6 +1,7 @@
 ﻿using DotNetty.Buffers;
 using DotNetty.Codecs;
 using DotNetty.Transport.Channels;
+using System;
 
 namespace Argo.Internal
 {
@@ -9,7 +10,7 @@ namespace Argo.Internal
         private IPacketCodec _packetCodec;
 
         public DotNettyMessageDecoder(IPacketCodec packetCodec)
-            : base(ByteOrder.LittleEndian,
+            : base(packetCodec.IsLittleEndian ? ByteOrder.LittleEndian : ByteOrder.BigEndian,
                   ushort.MaxValue,
                   packetCodec.LengthFieldOffset,
                   packetCodec.LengthFieldLength,
@@ -24,12 +25,11 @@ namespace Argo.Internal
         {
             if (base.Decode(context, input) is IByteBuffer byteBuffer)
             {
-                var bodyLength = base.GetUnadjustedFrameLength(input, _packetCodec.LengthFieldOffset, _packetCodec.LengthFieldLength, ByteOrder.LittleEndian);
-                var bytes = new byte[_packetCodec.HeaderLenght + bodyLength];
+                var bodyLength = base.GetUnadjustedFrameLength(input, _packetCodec.LengthFieldOffset, _packetCodec.LengthFieldLength, _packetCodec.IsLittleEndian ? ByteOrder.LittleEndian : ByteOrder.BigEndian);
+                var readBytes = new byte[_packetCodec.HeaderLenght + bodyLength];
 
-                byteBuffer.ReadBytes(bytes);
-
-                var message = _packetCodec.Decode(bytes);
+                byteBuffer.ReadBytes(readBytes);
+                var message = _packetCodec.Decode(readBytes);
 
                 return message;
             }

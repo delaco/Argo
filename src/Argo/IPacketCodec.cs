@@ -20,6 +20,8 @@ namespace Argo
 
         int HeaderLenght { get; }
 
+        bool IsLittleEndian { get; }
+
         IPacket Decode(Span<byte> byteBuffer);
 
         Span<byte> Encode(IPacket packet);

@@ -25,11 +25,11 @@ namespace AdvancedServer.Commands
         internal PacketInfo ExecuteCore(IPacket packet)
         {
             ///var req = Proxy_UserEntryReq.Parser.ParseFrom(packet.Body.ToArray());
-            ///Logger.LogInformation($"The request:{req.UserId}) already processed");
+            ///Logger.LogInformation($"The request:{req.UserId}) already processed");A
 
             Proxy_UserEntryResp resp = new Proxy_UserEntryResp();
             resp.UserId = 1;
-            resp.Result = new ResponseResult() { Code = 0, Message = "" };
+            resp.Result = new ResponseResult() { Code = 111, Message = "test message" };
 
             return new PacketInfo(packet.Command, packet.Sequence, resp.ToByteArray());
         }
