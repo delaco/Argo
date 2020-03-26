@@ -14,7 +14,7 @@ namespace Argo
 
         public string Host { get; }
 
-        public async Task SendAsync(IMessage message)
+        public async Task SendAsync(IPacket message)
         {
             await Session.SendAsync(message);
         }

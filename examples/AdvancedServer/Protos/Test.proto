@@ -1,0 +1,17 @@
+﻿syntax = "proto3";
+package AdvancedServer.Test;
+
+message ResponseResult {
+  int32 code = 1; 
+  string message = 2;
+}
+
+message Proxy_UserEntryReq {
+  int32 userId = 1; 
+  string userName = 2;
+}
+
+message Proxy_UserEntryResp {
+  int32 userId = 1; 
+  ResponseResult result = 2;
+}

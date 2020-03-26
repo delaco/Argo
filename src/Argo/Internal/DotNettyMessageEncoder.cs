@@ -10,18 +10,18 @@ using System.Threading.Tasks;
 
 namespace Argo.Internal
 {
-    internal class DotNettyMessageEncoder : MessageToMessageEncoder<IMessage>
+    internal class DotNettyMessageEncoder : MessageToMessageEncoder<IPacket>
     {
-        private IMessageCodec _messageCodec;
+        private IPacketCodec _packetCodec;
 
-        public DotNettyMessageEncoder(IMessageCodec messageCodec)
+        public DotNettyMessageEncoder(IPacketCodec packetCodec)
         {
-            _messageCodec = messageCodec;
+            _packetCodec = packetCodec;
         }
 
-        protected override void Encode(IChannelHandlerContext context, IMessage message, List<object> output)
+        protected override void Encode(IChannelHandlerContext context, IPacket message, List<object> output)
         {
-            var bytes = _messageCodec.Encode(message);
+            var bytes = _packetCodec.Encode(message);
 
             IByteBuffer byteBuffer = Unpooled.CopiedBuffer(bytes.ToArray());
             output.Add(byteBuffer.Retain());
@@ -30,7 +30,7 @@ namespace Argo.Internal
 
     internal class DotNettyMessageWebSocketEncoder : DotNettyMessageEncoder
     {
-        public DotNettyMessageWebSocketEncoder(IMessageCodec messageCodec) : base(messageCodec)
+        public DotNettyMessageWebSocketEncoder(IPacketCodec packetCodec) : base(packetCodec)
         {
         }
 
@@ -43,7 +43,7 @@ namespace Argo.Internal
                 if (base.AcceptOutboundMessage(msg))
                 {
                     output = ThreadLocalObjectList.NewInstance();
-                    var cast = (MessagePacket)msg;
+                    var cast = (PacketInfo)msg;
                     try
                     {
                         base.Encode(ctx, cast, output);

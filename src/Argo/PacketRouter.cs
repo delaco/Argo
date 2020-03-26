@@ -5,19 +5,19 @@ using System;
 
 namespace Argo
 {
-    public class MessageRouter : IMessageRouter
+    public class PacketRouter : IMessageRouter
     {
         private IServiceProvider _serviceProvider;
         private ICommandDescriptorContainer _commandContainer;
         private ICommandActivator _commandActivator;
         private IPassThroughRuleProvider _passthroughRuleProvider;
-        private ILogger<MessageRouter> _logger;
+        private ILogger<PacketRouter> _logger;
 
-        public MessageRouter(IServiceProvider serviceProvider,
+        public PacketRouter(IServiceProvider serviceProvider,
             ICommandDescriptorContainer commandContainer,
             ICommandActivator commandActivator,
             IPassThroughRuleProvider passthroughRuleProvider,
-            ILogger<MessageRouter> logger)
+            ILogger<PacketRouter> logger)
         {
             _serviceProvider = serviceProvider ?? throw new NullReferenceException(nameof(serviceProvider));
             _commandContainer = commandContainer ?? throw new NullReferenceException(nameof(commandContainer));
@@ -48,7 +48,7 @@ namespace Argo
                 }
                 else
                 {
-                    _logger.LogWarning($"The msg' command {requestContext.Message} was not found.");
+                    _logger.LogWarning($"The msg' command {requestContext.Packet} was not found.");
                 }
             }
         }

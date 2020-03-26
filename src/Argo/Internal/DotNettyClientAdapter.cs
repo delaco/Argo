@@ -15,13 +15,13 @@ namespace Argo.Internal
     {
         private ILogger<DottNettyClientAdapter> _logger;
         private IServiceProvider _serviceProvider;
-        private IMessageCodec _messageCodec;
+        private IPacketCodec _packetCodec;
 
         public DottNettyClientAdapter(ILogger<DottNettyClientAdapter> logger, IServiceProvider serviceProvider)
         {
             this._logger = logger;
             _serviceProvider = serviceProvider;
-            _messageCodec = _serviceProvider.GetRequiredService<IMessageCodec>();
+            _packetCodec = _serviceProvider.GetRequiredService<IPacketCodec>();
         }
 
         public SocketClient Create(SocketClientOptions option)
@@ -40,10 +40,10 @@ namespace Argo.Internal
                    {
                        IChannelPipeline pipeline = channel.Pipeline;
                        pipeline.AddLast(new LoggingHandler("CONN"));
-                       pipeline.AddLast("framing-enc", new DotNettyMessageEncoder(_messageCodec));
-                       pipeline.AddLast("framing-dec", new DotNettyMessageDecoder(_messageCodec));
-                       pipeline.AddLast(new SyncReceiverHandler<IMessage>(_serviceProvider, true));
-                       pipeline.AddLast(new ReceiverHandler<IMessage>(_serviceProvider, true));
+                       pipeline.AddLast("framing-enc", new DotNettyMessageEncoder(_packetCodec));
+                       pipeline.AddLast("framing-dec", new DotNettyMessageDecoder(_packetCodec));
+                       pipeline.AddLast(new SyncReceiverHandler<IPacket>(_serviceProvider, true));
+                       pipeline.AddLast(new ReceiverHandler<IPacket>(_serviceProvider, true));
                    }));
             }
             else
@@ -63,7 +63,7 @@ namespace Argo.Internal
         }
 
         internal class ReceiverHandler<T> : ChannelHandlerAdapter
-             where T : IMessage
+             where T : IPacket
         {
             private readonly IServiceProvider _serviceProvider;
             private readonly bool _autoRelease;
@@ -76,7 +76,7 @@ namespace Argo.Internal
                 this._autoRelease = autoRelease;
             }
 
-            bool AcceptInboundMessage(object msg) => msg is IMessage;
+            bool AcceptInboundMessage(object msg) => msg is IPacket;
 
             public override void ChannelInactive(IChannelHandlerContext context)
             {
@@ -110,7 +110,7 @@ namespace Argo.Internal
         }
 
         internal class SyncReceiverHandler<T> : ChannelHandlerAdapter
-          where T : IMessage
+          where T : IPacket
         {
             private readonly IServiceProvider _serviceProvider;
             private readonly bool _autoRelease;
@@ -132,11 +132,10 @@ namespace Argo.Internal
 
             public override void ChannelRead(IChannelHandlerContext context, object msg)
             {
-
                 bool release = true;
                 try
                 {
-                    if (msg is IMessage message && message.Sequence == 0)
+                    if (msg is IPacket message && message.Sequence == 0)
                     {
                         _clientWaits.Set(context.Channel.Id.ToString(), message);
                     }

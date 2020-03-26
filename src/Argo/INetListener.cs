@@ -4,8 +4,8 @@ namespace Argo
 {
     public interface INetListener
     {
-        Task StartListenerAsync();
+        Task StartAsync();
 
-        Task CloseListenerAsync();
+        Task CloseAsync();
     }
 }

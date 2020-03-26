@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Argo
 {
-    public interface IMessageCodec
+    public interface IPacketCodec
     {
         int CommandFieldOffset { get; }
 
@@ -20,8 +20,10 @@ namespace Argo
 
         int HeaderLenght { get; }
 
-        IMessage Decode(Span<byte> byteBuffer);
+        bool IsLittleEndian { get; }
 
-        Span<byte> Encode(IMessage message);
+        IPacket Decode(Span<byte> byteBuffer);
+
+        Span<byte> Encode(IPacket packet);
     }
 }

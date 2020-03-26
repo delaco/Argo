@@ -10,7 +10,7 @@ using System.Net.Sockets;
 namespace Argo.Internal
 {
     public sealed class SocketServerHandler<T> : ChannelHandlerAdapter
-              where T : IMessage
+              where T : IPacket
     {
         private IServiceProvider _serviceProvider;
         private SessionContainer<Session> _sessionContainer;
@@ -19,7 +19,7 @@ namespace Argo.Internal
         private ILogger _logger;
         private ICommandDescriptorContainer _commandContainer;
         private ICommandActivator _commandActivator;
-        private static readonly AttributeKey<Session> SessionKey = AttributeKey<Session>.ValueOf(nameof(Session));
+
 
         public SocketServerHandler(IServiceProvider serviceProvider, bool autoRelease)
         {
@@ -44,7 +44,6 @@ namespace Argo.Internal
             var messageHandler = new DotNettyMessageHandlerProvider(channel, null).Create();
             session.Initialize(channel.RemoteAddress, messageHandler);
 
-            context.Channel.GetAttribute(SessionKey).Set(session);
             this._sessionContainer.Set(channel.Id.ToString(), session);
         }
 
@@ -74,16 +73,21 @@ namespace Argo.Internal
 
         public override void ChannelRead(IChannelHandlerContext context, object msg)
         {
-            var session = _sessionContainer.Get(context.Channel.ToString());
-            session.LastAccessTime = DateTime.Now;
             var channel = context.Channel;
+            var session = _sessionContainer.Get(channel.Id.ToString());
+            if (session != null)
+            {
+                session.LastAccessTime = DateTime.Now;
+            }
+
+          
             bool release = true;
             try
             {
-                if (msg is IMessage message)
+                if (msg is IPacket packet)
                 {
                     _logger.LogInformation($"The msg {msg} from {channel} has been read.");
-                    var requestContext = new RequestContext(session, message);
+                    var requestContext = new RequestContext(session, packet);
                     _messageRouter.Route(requestContext);
                 }
                 else

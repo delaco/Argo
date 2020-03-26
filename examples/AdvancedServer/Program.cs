@@ -3,9 +3,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 
-namespace SimpleServer
+namespace AdvancedServer
 {
     class Program
     {
@@ -19,7 +18,6 @@ namespace SimpleServer
                 .UseArgo(config)
                 .ConfigureServices((service) =>
                 {
-                    service.AddSocketClient(config);
                 })
                 .ConfigureLogging((loggingBuilder) =>
                 {
