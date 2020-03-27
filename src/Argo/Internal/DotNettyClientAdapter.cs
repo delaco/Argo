@@ -6,12 +6,13 @@ using DotNetty.Transport.Channels.Sockets;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Diagnostics.Contracts;
 using System.Net;
 using System.Net.Sockets;
 
 namespace Argo.Internal
 {
-    internal class DottNettyClientAdapter : ISocketClientProvider
+    public class DottNettyClientAdapter : ISocketClientProvider
     {
         private ILogger<DottNettyClientAdapter> _logger;
         private IServiceProvider _serviceProvider;
@@ -26,6 +27,7 @@ namespace Argo.Internal
 
         public SocketClient Create(SocketClientOptions option)
         {
+            Contract.Requires(option != null);
             var group = new MultithreadEventLoopGroup();
 
             Bootstrap bootstrap;

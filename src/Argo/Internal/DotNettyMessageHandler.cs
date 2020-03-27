@@ -5,14 +5,13 @@ using System.Threading.Tasks;
 
 namespace Argo.Internal
 {
-    internal class DotNettyMessageHandler : IMessageHandler
+    public class DotNettyMessageHandler : IMessageHandler
     {
         private IChannel _channel;
         private ClientWaits _clientWait;
+        public readonly AutoResetEvent AutoResetEvent = new AutoResetEvent(false);
 
         public IPacket AyscResponse { get; set; }
-
-        public AutoResetEvent AutoResetEvent = new AutoResetEvent(false);
 
         internal DotNettyMessageHandler(IChannel channel, ClientWaits clientWait)
         {
@@ -22,7 +21,7 @@ namespace Argo.Internal
 
         public async Task SendAsync(IPacket message)
         {
-            await _channel.WriteAndFlushAsync(message);
+            await _channel.WriteAndFlushAsync(message).ConfigureAwait(false);
         }
 
         public Task<IPacket> Send(IPacket message)

@@ -1,11 +1,16 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Diagnostics.Contracts;
 
 namespace Argo.Internal
 {
-    internal class ClientWaits
+    public class ClientWaits
     {
         private readonly ConcurrentDictionary<string, DotNettyMessageHandler> _waits = new ConcurrentDictionary<string, DotNettyMessageHandler>();
+
+        public ClientWaits()
+        { 
+        }
 
         /// <summary>
         /// 
@@ -14,6 +19,7 @@ namespace Argo.Internal
         /// <param name="messageHandler"></param>
         public void Start(string key, DotNettyMessageHandler messageHandler)
         {
+            Contract.Requires(messageHandler != null);
             messageHandler.AyscResponse = null;
             if (!_waits.TryAdd(key, messageHandler))
             {

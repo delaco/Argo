@@ -2,6 +2,7 @@
 using Argo.PassThrough;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Diagnostics.Contracts;
 
 namespace Argo
 {
@@ -28,6 +29,7 @@ namespace Argo
 
         public virtual void Route(RequestContext requestContext)
         {
+            Contract.Requires(requestContext != null);
             var passthroughRule = _passthroughRuleProvider.Create(requestContext);
 
             if (passthroughRule.IsPassThrough)
@@ -48,7 +50,7 @@ namespace Argo
                 }
                 else
                 {
-                    _logger.LogWarning($"The msg' command {requestContext.Packet} was not found.");
+                    _logger.LogWarning($"The msg' command {requestContext.Packet.Command} was not found.");
                 }
             }
         }

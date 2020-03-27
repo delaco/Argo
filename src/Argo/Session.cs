@@ -36,7 +36,7 @@ namespace Argo
 
         public async Task SendAsync(IPacket message)
         {
-            await this._messageHandler.SendAsync(message);
+            await _messageHandler.SendAsync(message).ConfigureAwait(false);
         }
     }
 }

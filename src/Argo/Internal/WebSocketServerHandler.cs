@@ -44,6 +44,11 @@ namespace Argo.Internal
 
         protected override void ChannelRead0(IChannelHandlerContext ctx, object msg)
         {
+            if (ctx == null)
+            {
+                throw new ArgumentNullException(nameof(ctx));
+            }
+
             if (msg is IFullHttpRequest request)
             {
                 this.HandleHttpRequest(ctx, request);
@@ -54,7 +59,15 @@ namespace Argo.Internal
             }
         }
 
-        public override void ChannelReadComplete(IChannelHandlerContext context) => context.Flush();
+        public override void ChannelReadComplete(IChannelHandlerContext context)
+        {
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
+            context.Flush();
+        }
 
         void HandleHttpRequest(IChannelHandlerContext ctx, IFullHttpRequest req)
         {
@@ -114,12 +127,12 @@ namespace Argo.Internal
                     ctx.WriteAsync(frame.Retain());
                     return;
                 case BinaryWebSocketFrame _:
-                    HandleBinaryWebSocketFrame(ctx, (BinaryWebSocketFrame)frame.Retain(), appSession);
+                    HandleBinaryWebSocketFrame((BinaryWebSocketFrame)frame.Retain(), appSession);
                     return;
             }
         }
 
-        private void HandleBinaryWebSocketFrame(IChannelHandlerContext context, BinaryWebSocketFrame binaryWebSocketFrame, AppSession appSession)
+        private void HandleBinaryWebSocketFrame(BinaryWebSocketFrame binaryWebSocketFrame, AppSession appSession)
         {
             var byteBuffer = binaryWebSocketFrame.Content;
             var readBytes = new byte[byteBuffer.ReadableBytes];
@@ -168,6 +181,11 @@ namespace Argo.Internal
 
         public override void ExceptionCaught(IChannelHandlerContext ctx, Exception e)
         {
+            if (ctx == null)
+            {
+                throw new ArgumentNullException(nameof(ctx));
+            }
+
             Console.WriteLine($"{nameof(WebSocketServerHandler)} {0}", e);
             ctx.CloseAsync();
         }

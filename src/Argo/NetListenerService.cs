@@ -1,5 +1,4 @@
-﻿using Argo.AssemblyParts;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
@@ -40,7 +39,7 @@ namespace Argo
                 _netListeners.Add(netListener);
                 _logger.LogInformation($"NetListener mode:{opt.SocketMode} port:{opt.Port} starting");
 
-                await netListener?.StartAsync();
+                await (netListener?.StartAsync()).ConfigureAwait(false);
             }
         }
 
@@ -50,7 +49,7 @@ namespace Argo
             {
                 _logger.LogInformation($"NetListener stopping");
 
-                await netListener?.CloseAsync();
+                await (netListener?.CloseAsync()).ConfigureAwait(false);
             }
         }
     }

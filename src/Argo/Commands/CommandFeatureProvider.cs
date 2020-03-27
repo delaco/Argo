@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System;
 
 namespace Argo.Commands
 {
@@ -14,6 +15,11 @@ namespace Argo.Commands
             IEnumerable<AssemblyPart> parts,
             CommandFeature feature)
         {
+            if (feature == null)
+            {
+                throw new ArgumentNullException(nameof(feature));
+            }
+
             foreach (var part in parts.OfType<AssemblyPart>())
             {
                 foreach (var type in part.Types)
@@ -33,6 +39,11 @@ namespace Argo.Commands
         /// <returns><code>true</code> if the type is a command; otherwise <code>false</code>.</returns>
         protected virtual bool IsCommand(TypeInfo typeInfo)
         {
+            if (typeInfo == null)
+            {
+                throw new ArgumentNullException(nameof(typeInfo));
+            }
+
             if (!typeInfo.IsClass)
             {
                 return false;

@@ -68,11 +68,11 @@ namespace Argo.Internal
             }
             catch (EncoderException e)
             {
-                return TaskEx.FromException(e);
+                throw new EncoderException(e);
             }
             catch (Exception ex)
             {
-                return TaskEx.FromException(new EncoderException(ex));
+                throw new EncoderException(ex);
             }
             finally
             {

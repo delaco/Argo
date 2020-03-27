@@ -12,13 +12,6 @@ namespace Argo
 
         public string Host { get; }
 
-        public bool Active
-        {
-            get
-            {
-                return false;
-            }
-
-        }
+        public bool Active { get; } = true;
     }
 }

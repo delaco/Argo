@@ -6,7 +6,7 @@ namespace Argo.Commands
     /// User this attribute to set the properties of command
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
-    public class CommandAttribute : Attribute
+    public sealed class CommandAttribute : Attribute
     {
         /// <summary>
         /// The value which key a command handler
@@ -23,17 +23,6 @@ namespace Argo.Commands
         public CommandAttribute(int id, bool invalid)
         {
             Id = id;
-            Invalid = invalid;
-        }
-
-        public CommandAttribute(string key)
-        : this(key, false)
-        {
-        }
-
-        public CommandAttribute(string key, bool invalid)
-        {
-            Id = (int)key.GetHashCode();
             Invalid = invalid;
         }
     }

@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using System;
+using System.Diagnostics.Contracts;
 
 namespace Argo
 {
@@ -12,13 +13,14 @@ namespace Argo
 
         public SocketClient(string remoteName, IMessageHandlerProvider messageHandlerFactory)
         {
+            Contract.Requires(messageHandlerFactory != null);
             this.RemoteName = remoteName;
             this._messageHandler = messageHandlerFactory.Create();
         }
 
         public async Task SendAsync(IPacket message)
         {
-            await _messageHandler.SendAsync(message);
+            await _messageHandler.SendAsync(message).ConfigureAwait(false);
         }
 
         public Task<IPacket> Send(IPacket message)

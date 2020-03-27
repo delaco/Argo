@@ -24,11 +24,13 @@ namespace AdvancedServer.Commands
 
         internal IPacket ExecuteInternal(IPacket packet)
         {
-            var req = Proxy_UserEntryReq.Parser.ParseFrom(packet.Body);
+            var req = Proxy_UserEntryReq.Parser.ParseFrom(packet.Body.ToArray());
             Logger.LogInformation($"The request:{req.UserId}) already processed");
-            Proxy_UserEntryResp resp = new Proxy_UserEntryResp();
-            resp.UserId = req.UserId;
-            resp.Result = new ResponseResult() { Code = 111, Message = "test message" };
+            Proxy_UserEntryResp resp = new Proxy_UserEntryResp
+            {
+                UserId = req.UserId,
+                Result = new ResponseResult() { Code = 111, Message = "test message" }
+            };
 
             return new PacketInfo(packet.Command, packet.Sequence, resp.ToByteArray());
         }

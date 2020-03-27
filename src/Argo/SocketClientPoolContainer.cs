@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Concurrent;
+using System.Diagnostics.Contracts;
 
 namespace Argo
 {
@@ -55,6 +56,7 @@ namespace Argo
 
         public void Return(SocketClient client)
         {
+            Contract.Requires(client != null);
             if (_objectPoolDict.TryGetValue(client.RemoteName, out ObjectPool<SocketClient> objectPool))
             {
                 objectPool.Return(client);
