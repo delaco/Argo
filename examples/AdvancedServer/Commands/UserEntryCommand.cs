@@ -19,12 +19,12 @@ namespace AdvancedServer.Commands
         public void Execute(RequestContext requestContext)
         {
             var ret = ExecuteInternal(requestContext.Packet);
-            requestContext.Session?.SendAsync(ret);
+            requestContext.AppSession?.SendAsync(ret);
         }
 
         internal IPacket ExecuteInternal(IPacket packet)
         {
-            var req = Proxy_UserEntryReq.Parser.ParseFrom(packet.Body.ToArray());
+            var req = Proxy_UserEntryReq.Parser.ParseFrom(packet.Body);
             Logger.LogInformation($"The request:{req.UserId}) already processed");
             Proxy_UserEntryResp resp = new Proxy_UserEntryResp();
             resp.UserId = req.UserId;

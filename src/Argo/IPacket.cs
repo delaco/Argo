@@ -8,6 +8,6 @@ namespace Argo
 
         int Sequence { get; }
 
-        Span<byte> Body { get; }
+        byte[] Body { get; }
     }
 }

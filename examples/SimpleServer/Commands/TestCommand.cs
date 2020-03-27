@@ -19,7 +19,7 @@ namespace SimpleServer.Commands
         public void Execute(RequestContext requestContext)
         {
             var ret = this.ExecuteCore(requestContext.Packet);
-            requestContext.Session?.SendAsync(ret);
+            requestContext.AppSession?.SendAsync(ret);
         }
 
         internal PacketInfo ExecuteCore(IPacket message)

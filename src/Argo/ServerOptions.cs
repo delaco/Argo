@@ -5,6 +5,7 @@ namespace Argo
 {
     public class ServerOptions
     {
+        public string ServerName { get; set; }
         public List<ListenerOptions> Listeners { get; set; }
     }
 

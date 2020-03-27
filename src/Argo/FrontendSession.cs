@@ -8,15 +8,17 @@ namespace Argo
     /// </summary>
     public class FrontendSession
     {
-        public Session Session { get; }
-
-        public string UserId { get; }
+        public string UId { get; }
 
         public string Host { get; }
 
-        public async Task SendAsync(IPacket message)
+        public bool Active
         {
-            await Session.SendAsync(message);
+            get
+            {
+                return false;
+            }
+
         }
     }
 }

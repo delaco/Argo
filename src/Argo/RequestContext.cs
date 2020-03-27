@@ -3,7 +3,7 @@
     public class RequestContext
     {
         private IPacket _packet;
-        private Session _session;
+        private AppSession _appSession;
 
         /// <summary>
         /// Gets the packet
@@ -12,14 +12,14 @@
         public IPacket Packet => _packet;
 
         /// <summary>
-        /// Gets the session
+        /// Gets the appSession
         /// </summary>
         /// <returns></returns>
-        public Session Session => _session;
+        public AppSession AppSession => _appSession;
 
-        public RequestContext(Session session, IPacket packet)
+        public RequestContext(AppSession appSession, IPacket packet)
         {
-            this._session = session;
+            this._appSession = appSession;
             this._packet = packet;
         }
     }

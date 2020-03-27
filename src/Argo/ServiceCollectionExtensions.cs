@@ -53,8 +53,7 @@ namespace Argo
 
         public static IServiceCollection AddSocketClient(this IServiceCollection serviceCollection, IConfiguration config)
         {
-            var options = ConfigurationBinder.Get<RemoteOptions>(config);
-            serviceCollection.AddSingleton(options);
+            serviceCollection.Configure<RemoteOptions>(config);
             serviceCollection.AddSingleton<ClientWaits>();
             serviceCollection.AddSingleton<IPacketCodec, DefaultPacketCodec>();
             serviceCollection.AddSingleton<IMessageHandlerProvider, DotNettyMessageHandlerProvider>();

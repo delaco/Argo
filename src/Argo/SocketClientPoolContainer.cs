@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.ObjectPool;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Concurrent;
 
@@ -20,11 +21,11 @@ namespace Argo
         private ISocketClientProvider _socketClientProvider;
         private ObjectPoolProvider _objectPoolProvider;
 
-        public SocketClientPoolContainer(RemoteOptions options,
+        public SocketClientPoolContainer(IOptions<RemoteOptions> options,
             ISocketClientProvider socketClientProvider,
             ObjectPoolProvider objectPoolProvider)
         {
-            this._options = options ?? throw new ArgumentNullException(nameof(options));
+            this._options = (options ?? throw new ArgumentNullException(nameof(options))).Value;
             _objectPoolProvider = objectPoolProvider ?? throw new ArgumentNullException(nameof(objectPoolProvider));
             _socketClientProvider = socketClientProvider ?? throw new ArgumentNullException(nameof(socketClientProvider));
         }

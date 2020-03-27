@@ -9,7 +9,7 @@ namespace Argo
 
         public int Sequence { get; }
 
-        public Span<byte> Body => _body;
+        public byte[] Body => _body;
 
         public PacketInfo(int command, int sequence, byte[] body)
         {

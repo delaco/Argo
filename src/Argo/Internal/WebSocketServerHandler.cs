@@ -21,7 +21,7 @@ namespace Argo.Internal
         const string WebsocketPath = "/websocket";
 
         private IServiceProvider _serviceProvider;
-        private SessionContainer<Session> _sessionContainer;
+        private AppSessionContainer<AppSession> _appSessionContainer;
         private ICommandDescriptorContainer _commandContainer;
         private WebSocketServerHandshaker _handshaker;
         private ICommandActivator _commandActivator;
@@ -31,7 +31,7 @@ namespace Argo.Internal
 
         public WebSocketServerHandler(IServiceProvider serviceProvider, ListenerOptions netListenerOptions)
         {
-            this._sessionContainer = serviceProvider.GetRequiredService<SessionContainer<Session>>();
+            this._appSessionContainer = serviceProvider.GetRequiredService<AppSessionContainer<AppSession>>();
             this._serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
             this._netListenerOptions = netListenerOptions ?? throw new ArgumentNullException(nameof(netListenerOptions));
 
@@ -83,25 +83,24 @@ namespace Argo.Internal
             else
             {
                 _logger.LogInformation($"New client to handshake:{ctx.Channel}");
-                var channel = ctx.Channel;
-                var session = new Session();
-                var messageHandler = new DotNettyMessageHandlerProvider(channel, null).Create();
-                session.Initialize(channel.RemoteAddress, messageHandler);
+                var appSession = new AppSession();
+                var messageHandler = new DotNettyMessageHandlerProvider(ctx.Channel, null).Create();
+                appSession.Initialize(appSession.RemoteAddress, messageHandler);
 
-                this._sessionContainer.Set(channel.Id.ToString(), session);
+                this._appSessionContainer.Set(ctx.Channel.Id.ToString(), appSession);
                 this._handshaker.HandshakeAsync(ctx.Channel, req);
             }
         }
 
         void HandleWebSocketFrame(IChannelHandlerContext ctx, WebSocketFrame frame)
         {
-            var session = _sessionContainer.Get(ctx.Channel.Id.ToString());
-            if (session == null)
+            var appSession = _appSessionContainer.Get(ctx.Channel.Id.ToString());
+            if (appSession == null)
             {
-                throw new ArgumentNullException(nameof(session));
+                throw new ArgumentNullException(nameof(appSession));
             }
 
-            session.LastAccessTime = DateTime.Now;
+            appSession.LastAccessTime = DateTime.Now;
             switch (frame)
             {
                 // Check for closing frame
@@ -115,19 +114,19 @@ namespace Argo.Internal
                     ctx.WriteAsync(frame.Retain());
                     return;
                 case BinaryWebSocketFrame _:
-                    HandleBinaryWebSocketFrame(ctx, (BinaryWebSocketFrame)frame.Retain(), session);
+                    HandleBinaryWebSocketFrame(ctx, (BinaryWebSocketFrame)frame.Retain(), appSession);
                     return;
             }
         }
 
-        private void HandleBinaryWebSocketFrame(IChannelHandlerContext context, BinaryWebSocketFrame binaryWebSocketFrame, Session session)
+        private void HandleBinaryWebSocketFrame(IChannelHandlerContext context, BinaryWebSocketFrame binaryWebSocketFrame, AppSession appSession)
         {
             var byteBuffer = binaryWebSocketFrame.Content;
             var readBytes = new byte[byteBuffer.ReadableBytes];
             byteBuffer.ReadBytes(readBytes);
             var message = _packetCodec.Decode(readBytes);
 
-            var requestContext = new RequestContext(session, message);
+            var requestContext = new RequestContext(appSession, message);
             var commandDescriptor = _commandContainer.Get(requestContext);
             if (commandDescriptor != null)
             {

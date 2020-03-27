@@ -13,7 +13,7 @@ namespace Argo.Internal
               where T : IPacket
     {
         private IServiceProvider _serviceProvider;
-        private SessionContainer<Session> _sessionContainer;
+        private AppSessionContainer<AppSession> _appSessionContainer;
         private IMessageRouter _messageRouter;
         private readonly bool _autoRelease;
         private ILogger _logger;
@@ -23,7 +23,7 @@ namespace Argo.Internal
 
         public SocketServerHandler(IServiceProvider serviceProvider, bool autoRelease)
         {
-            this._sessionContainer = serviceProvider.GetRequiredService<SessionContainer<Session>>();
+            this._appSessionContainer = serviceProvider.GetRequiredService<AppSessionContainer<AppSession>>();
 
             this._messageRouter = serviceProvider.GetRequiredService<IMessageRouter>();
             this._commandContainer = serviceProvider.GetRequiredService<ICommandDescriptorContainer>();
@@ -40,17 +40,17 @@ namespace Argo.Internal
             base.ChannelActive(context);
 
             var channel = context.Channel;
-            var session = new Session();
+            var session = new AppSession();
             var messageHandler = new DotNettyMessageHandlerProvider(channel, null).Create();
             session.Initialize(channel.RemoteAddress, messageHandler);
 
-            this._sessionContainer.Set(channel.Id.ToString(), session);
+            this._appSessionContainer.Set(channel.Id.ToString(), session);
         }
 
         public override void ChannelInactive(IChannelHandlerContext context)
         {
             base.ChannelInactive(context);
-            this._sessionContainer.Remove(context.Channel.Id.ToString());
+            this._appSessionContainer.Remove(context.Channel.Id.ToString());
         }
 
         public override void UserEventTriggered(IChannelHandlerContext context, object evt)
@@ -74,7 +74,7 @@ namespace Argo.Internal
         public override void ChannelRead(IChannelHandlerContext context, object msg)
         {
             var channel = context.Channel;
-            var session = _sessionContainer.Get(channel.Id.ToString());
+            var session = _appSessionContainer.Get(channel.Id.ToString());
             if (session != null)
             {
                 session.LastAccessTime = DateTime.Now;

@@ -24,8 +24,8 @@ namespace Argo
                 services.Configure<ServerOptions>(config);
                 services.AddSingleton<IPacketCodec, DefaultPacketCodec>();
                 services.AddSingleton<INetListenerProvider, DotNettyListenerProvider>();
-                var sessionContainer = new SessionContainer<Session>();
-                services.AddSingleton(sessionContainer);
+                var appSessionContainer = new AppSessionContainer<AppSession>();
+                services.AddSingleton(appSessionContainer);
                 services.AddSingleton<IHostedService, NetListenerService>();
                 var options = ConfigurationBinder.Get<ServerOptions>(config);
                 if (options != null && options.Listeners.Any())
