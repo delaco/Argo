@@ -1,22 +1,32 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
+using System;
 
 namespace Argo
 {
     /// <summary>
     /// todo:
     /// </summary>
-    public class FrontendSession
+    public class FrontendSession : ISession
     {
-        public Session Session { get; }
+        private DateTime _createTime;
+        private DateTime _lastAccessTime;
 
-        public string UserId { get; }
+        public string UId { get; }
 
         public string Host { get; }
 
-        public async Task SendAsync(IPacket message)
+        public DateTime CreateTime => _createTime;
+
+        public DateTime LastAccessTime
         {
-            await Session.SendAsync(message);
+            get => _lastAccessTime;
+            set => _lastAccessTime = value;
+        }
+
+        internal FrontendSession()
+        {
+
         }
     }
 }

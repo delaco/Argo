@@ -3,23 +3,29 @@
     public class RequestContext
     {
         private IPacket _packet;
-        private Session _session;
+        private AppSession _appSession;
 
         /// <summary>
-        /// Gets the packet
+        /// Gets the request packet
         /// </summary>
         /// <returns></returns>
-        public IPacket Packet => _packet;
+        public IPacket Request => _packet;
 
         /// <summary>
-        /// Gets the session
+        /// Gets or sets the response packet
         /// </summary>
         /// <returns></returns>
-        public Session Session => _session;
+        public IPacket Response { get; set; }
 
-        public RequestContext(Session session, IPacket packet)
+        /// <summary>
+        /// Gets the appSession
+        /// </summary>
+        /// <returns></returns>
+        public AppSession AppSession => _appSession;
+
+        public RequestContext(AppSession appSession, IPacket packet)
         {
-            this._session = session;
+            this._appSession = appSession;
             this._packet = packet;
         }
     }

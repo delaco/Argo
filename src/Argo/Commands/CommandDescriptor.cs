@@ -33,6 +33,6 @@ namespace Argo.Commands
         /// <summary>
         /// Stores arbitrary metadata properties associated with the <see cref="CommandDescriptor"/>.
         /// </summary>
-        public IDictionary<object, object> Properties { get; set; }
+        public IDictionary<object, object> Properties { get; }
     }
 }

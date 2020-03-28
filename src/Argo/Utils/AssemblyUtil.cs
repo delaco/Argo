@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Reflection;
 
 namespace Argo.Utils
@@ -28,6 +29,8 @@ namespace Argo.Utils
         public static IEnumerable<TInterface> CreateInstance<TInterface>(this Assembly assembly, Type targetType)
             where TInterface : class
         {
+            Contract.Requires(assembly != null);
+            Contract.Requires(targetType != null);
             Type[] arrType = assembly.GetExportedTypes();
 
             var result = new List<TInterface>();
@@ -48,6 +51,8 @@ namespace Argo.Utils
         public static IEnumerable<Type> GetAssignabledTypes<TInterface>(this Assembly assembly)
             where TInterface : class
         {
+            Contract.Requires(assembly != null);
+
             Type targetType = typeof(TInterface);
             Type[] arrType = assembly.GetExportedTypes();
 
@@ -73,6 +78,7 @@ namespace Argo.Utils
         /// <returns></returns>
         public static IEnumerable<Assembly> GetAssembliesFromString(string assemblyDef)
         {
+            Contract.Requires(assemblyDef != null);
             return GetAssembliesFromStrings(assemblyDef.Split(new char[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries));
         }
 
@@ -83,6 +89,7 @@ namespace Argo.Utils
         /// <returns></returns>
         public static IEnumerable<Assembly> GetAssembliesFromStrings(string[] assemblies)
         {
+            Contract.Requires(assemblies != null);
             List<Assembly> result = new List<Assembly>(assemblies.Length);
 
             foreach (var a in assemblies)

@@ -4,15 +4,15 @@ using System.Threading.Tasks;
 
 namespace Argo
 {
-    public class Session
+    public class AppSession : ISession
     {
-        private string _sessionId;
+        private string _id;
         private DateTime _createTime;
         private DateTime _lastAccessTime;
         private EndPoint _remoteAddress;
         private IMessageHandler _messageHandler;
 
-        public string SessionId => _sessionId;
+        public string Id => _id;
 
         public DateTime CreateTime => _createTime;
 
@@ -28,7 +28,7 @@ namespace Argo
 
         public virtual void Initialize(EndPoint remoteAddress, IMessageHandler messageHandler)
         {
-            _sessionId = Guid.NewGuid().ToString();
+            _id = Guid.NewGuid().ToString();
             _createTime = DateTime.Now;
             _remoteAddress = remoteAddress;
             _messageHandler = messageHandler;
@@ -37,6 +37,11 @@ namespace Argo
         public async Task SendAsync(IPacket message)
         {
             await _messageHandler.SendAsync(message).ConfigureAwait(false);
+        }
+
+        public override string ToString()
+        {
+            return $"Id:{Id} CreateTime:{CreateTime} LastAccessTime:{LastAccessTime} {RemoteAddress}";
         }
     }
 }

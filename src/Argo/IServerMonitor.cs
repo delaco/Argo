@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Argo
 {
-    class BackendSession
+    public interface IServerMonitor
     {
+        Task Execute();
     }
 }

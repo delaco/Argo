@@ -72,7 +72,7 @@ namespace Argo.Internal
                            pipeline.AddLast(new WebSocketServerHandler(_serviceProvider, _options));
                        }
                    }));
-                _boundChannel = await bootstrap.BindAsync(_options.Port);
+                _boundChannel = await bootstrap.BindAsync(_options.Port).ConfigureAwait(false);
             }
             else
             {
@@ -80,7 +80,7 @@ namespace Argo.Internal
                 bootstrap
                     .Group(workerGroup)
                     .Channel<SocketDatagramChannel>();
-                _boundChannel = await bootstrap.BindAsync(_options.Port);
+                _boundChannel = await bootstrap.BindAsync(_options.Port).ConfigureAwait(false);
             }
 
           
@@ -88,7 +88,7 @@ namespace Argo.Internal
 
         public async Task CloseAsync()
         {
-            await _boundChannel?.CloseAsync();
+            await (_boundChannel?.CloseAsync()).ConfigureAwait(false);
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using Argo.Utils;
 using System;
 
-namespace Argo.Internal
+namespace Argo
 {
     public class DefaultPacketCodec : IPacketCodec
     {
@@ -53,6 +53,11 @@ namespace Argo.Internal
 
         public virtual Span<byte> Encode(IPacket packet)
         {
+            if (packet == null)
+            {
+                throw new ArgumentNullException(nameof(packet));
+            }
+
             var bodyLength = packet.Body.Length;
             var commandBuffer = ConvertUtil.GetFrameBuffer(packet.Command, CommandFieldLength, IsLittleEndian);
             var sequenceBuffer = ConvertUtil.GetFrameBuffer(packet.Sequence, SequenceFieldLength, IsLittleEndian);

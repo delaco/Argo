@@ -1,6 +1,6 @@
 ﻿namespace Argo.PassThrough
 {
-    internal class DefaultPassThroughRuleProvider : IPassThroughRuleProvider
+    public class DefaultPassThroughRuleProvider : IPassThroughRuleProvider
     {
         public IPassThroughRule Create(RequestContext requestContext)
         {

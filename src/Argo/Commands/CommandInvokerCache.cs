@@ -32,7 +32,7 @@ namespace Argo.Commands
         public object Get(CommandContext commandContext)
         {
             var cache = CurrentCache;
-            var commandDescriptor = commandContext.CommandDescriptor;
+            var commandDescriptor = commandContext?.CommandDescriptor;
             if (!cache.Entries.TryGetValue(commandDescriptor, out _))
             {
             }

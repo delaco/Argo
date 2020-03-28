@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Argo.Utils
 {
-    public class ConvertUtil
+    public static class ConvertUtil
     {
         public static long GetFrameValue(Span<byte> byteBuffer, int fieldOffset, int fieldlength, bool littleEndian)
         {
