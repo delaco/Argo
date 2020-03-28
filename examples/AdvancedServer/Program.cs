@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AdvancedServer
 {
@@ -18,6 +19,9 @@ namespace AdvancedServer
                 .UseArgo(config)
                 .ConfigureServices((service) =>
                 {
+                    service.AddStackExchangeRedisCache(options =>
+                    {
+                    });
                 })
                 .ConfigureLogging((loggingBuilder) =>
                 {

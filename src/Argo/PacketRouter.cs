@@ -50,7 +50,7 @@ namespace Argo
                 }
                 else
                 {
-                    _logger.LogWarning($"The msg' command {requestContext.Packet.Command} was not found.");
+                    _logger.LogWarning($"The msg' command {requestContext.Request.Command} was not found.");
                 }
             }
         }

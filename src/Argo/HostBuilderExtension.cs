@@ -15,18 +15,20 @@ namespace Argo
         {
             return builder.ConfigureServices((services) =>
             {
+                services.Configure<ServerOptions>(config);
                 var partManager = new AssemblyPartManager();
                 services.AddSingleton(partManager);
                 ConfigureFeatureProviders(partManager);
                 services.AddSingleton<ITypeActivatorCache, TypeActivatorCache>();
                 services.AddSingleton<IPassThroughRuleProvider, PassThroughRuleProvider>();
                 services.AddSingleton<IMessageRouter, PacketRouter>();
-                services.Configure<ServerOptions>(config);
                 services.AddSingleton<IPacketCodec, DefaultPacketCodec>();
                 services.AddSingleton<INetListenerProvider, DotNettyListenerProvider>();
                 var appSessionContainer = new AppSessionContainer<AppSession>();
                 services.AddSingleton(appSessionContainer);
                 services.AddSingleton<IHostedService, NetListenerService>();
+                services.AddSingleton<IServerMonitor, DefaultServerMonitor>();
+                services.AddSingleton<IHostedService, MonitorService>();
                 var options = ConfigurationBinder.Get<ServerOptions>(config);
                 if (options != null && options.Listeners.Any())
                 {

@@ -22,7 +22,7 @@ namespace Argo.Tests
 
         public void Execute(RequestContext requestContext)
         {
-            requestContext.AppSession?.SendAsync(requestContext.Packet);
+            requestContext.AppSession?.SendAsync(requestContext.Request);
         }
     }
 

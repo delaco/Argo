@@ -7,6 +7,12 @@ namespace Argo
     {
         public string ServerName { get; set; }
 
+        public bool InvalidSessionRelease { get; set; } = false;
+
+        public int InvalidSessionMonitoreInterval { get; set; }
+
+        public int SessionDeadTime { get; set; }
+
         public List<ListenerOptions> Listeners { get; set; }
     }
 

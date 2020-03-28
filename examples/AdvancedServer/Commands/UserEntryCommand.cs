@@ -18,7 +18,7 @@ namespace AdvancedServer.Commands
 
         public void Execute(RequestContext requestContext)
         {
-            var ret = ExecuteInternal(requestContext.Packet);
+            var ret = ExecuteInternal(requestContext.Request);
             requestContext.AppSession?.SendAsync(ret);
         }
 

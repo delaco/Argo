@@ -6,10 +6,16 @@
         private AppSession _appSession;
 
         /// <summary>
-        /// Gets the packet
+        /// Gets the request packet
         /// </summary>
         /// <returns></returns>
-        public IPacket Packet => _packet;
+        public IPacket Request => _packet;
+
+        /// <summary>
+        /// Gets or sets the response packet
+        /// </summary>
+        /// <returns></returns>
+        public IPacket Response { get; set; }
 
         /// <summary>
         /// Gets the appSession

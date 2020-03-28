@@ -1,7 +1,7 @@
 ﻿using Argo.Utils;
 using System;
 
-namespace Argo.Internal
+namespace Argo
 {
     public class DefaultPacketCodec : IPacketCodec
     {

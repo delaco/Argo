@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Argo
 {
-    public class AppSession
+    public class AppSession : ISession
     {
         private string _id;
         private DateTime _createTime;

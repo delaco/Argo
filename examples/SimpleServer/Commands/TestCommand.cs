@@ -18,7 +18,7 @@ namespace SimpleServer.Commands
 
         public void Execute(RequestContext requestContext)
         {
-            var ret = this.ExecuteCore(requestContext.Packet);
+            var ret = this.ExecuteCore(requestContext.Request);
             requestContext.AppSession?.SendAsync(ret);
         }
 
