@@ -32,7 +32,6 @@ namespace Argo
         public override async Task StartAsync(CancellationToken cancellationToken)
         {
             await base.StartAsync(cancellationToken);
-
         }
 
         public override async Task StopAsync(CancellationToken cancellationToken)

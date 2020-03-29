@@ -12,12 +12,6 @@
         public IPacket Request => _packet;
 
         /// <summary>
-        /// Gets or sets the response packet
-        /// </summary>
-        /// <returns></returns>
-        public IPacket Response { get; set; }
-
-        /// <summary>
         /// Gets the appSession
         /// </summary>
         /// <returns></returns>

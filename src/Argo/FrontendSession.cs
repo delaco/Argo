@@ -7,7 +7,7 @@ namespace Argo
     /// <summary>
     /// todo:
     /// </summary>
-    public class FrontendSession : ISession
+    public abstract class FrontendSession : ISession
     {
         private DateTime _createTime;
         private DateTime _lastAccessTime;
@@ -26,7 +26,7 @@ namespace Argo
 
         internal FrontendSession()
         {
-
+            _createTime = DateTime.Now;
         }
     }
 }

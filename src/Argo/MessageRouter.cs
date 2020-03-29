@@ -6,19 +6,19 @@ using System.Diagnostics.Contracts;
 
 namespace Argo
 {
-    public class PacketRouter : IMessageRouter
+    public class MessageRouter : IMessageRouter
     {
         private IServiceProvider _serviceProvider;
         private ICommandDescriptorContainer _commandContainer;
         private ICommandActivator _commandActivator;
         private IPassThroughRuleProvider _passthroughRuleProvider;
-        private ILogger<PacketRouter> _logger;
+        private ILogger<MessageRouter> _logger;
 
-        public PacketRouter(IServiceProvider serviceProvider,
+        public MessageRouter(IServiceProvider serviceProvider,
             ICommandDescriptorContainer commandContainer,
             ICommandActivator commandActivator,
             IPassThroughRuleProvider passthroughRuleProvider,
-            ILogger<PacketRouter> logger)
+            ILogger<MessageRouter> logger)
         {
             _serviceProvider = serviceProvider ?? throw new NullReferenceException(nameof(serviceProvider));
             _commandContainer = commandContainer ?? throw new NullReferenceException(nameof(commandContainer));

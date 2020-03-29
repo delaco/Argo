@@ -5,21 +5,40 @@ using Microsoft.Extensions.Caching.Distributed;
 
 namespace Argo
 {
-    public class FrontendSessionState
+    public class FrontendSessionState<TSession> where TSession : FrontendSession
     {
-        private readonly IDistributedCache _cache;
+        private DistributedCacheEntryOptions _distributedCacheEntryOptions;
 
-        public IDistributedCache DistributedCache => _cache;
+        public IDistributedCache DistributedCache { get; }
 
-        public FrontendSessionState()
+        public ISerializer Serializer { get; }
+
+        public FrontendSessionState(IDistributedCache distributedCache, ISerializer serializer)
         {
-            this._cache = null;
+            this.DistributedCache = distributedCache ?? throw new ArgumentNullException(nameof(distributedCache));
+
+            this.Serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
+            _distributedCacheEntryOptions = new DistributedCacheEntryOptions()
+            {
+                SlidingExpiration = new TimeSpan(hours: 24, minutes: 0, seconds: 0)
+            };
         }
 
-        public FrontendSession Get(string userId)
+        public TSession Get(string uId)
         {
-            this._cache.Get(userId);
-            return null;
+            var bytes = this.DistributedCache.Get(uId);
+            return Serializer.Deserialize<TSession>(bytes);
+        }
+
+        public void Add(TSession session)
+        {
+            var bytes = Serializer.Serialize(session);
+            DistributedCache.Set(session.UId, bytes, _distributedCacheEntryOptions);
+        }
+
+        public void Remove(string uId)
+        {
+            DistributedCache.Remove(uId);
         }
     }
 }

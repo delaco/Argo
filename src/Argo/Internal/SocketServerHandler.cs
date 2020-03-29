@@ -92,10 +92,6 @@ namespace Argo.Internal
                     _logger.LogInformation($"The msg {msg} from {channel} has been read.");
                     var requestContext = new RequestContext(session, packet);
                     _messageRouter.Route(requestContext);
-                    if (requestContext.Response != null)
-                    {
-                        requestContext.AppSession.SendAsync(requestContext.Response).ConfigureAwait(false);
-                    }
                 }
                 else
                 {

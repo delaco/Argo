@@ -19,9 +19,10 @@ namespace Argo
                 var partManager = new AssemblyPartManager();
                 services.AddSingleton(partManager);
                 ConfigureFeatureProviders(partManager);
+                services.AddSingleton<ISerializer, SystemJsonSerializer>();
                 services.AddSingleton<ITypeActivatorCache, TypeActivatorCache>();
                 services.AddSingleton<IPassThroughRuleProvider, PassThroughRuleProvider>();
-                services.AddSingleton<IMessageRouter, PacketRouter>();
+                services.AddSingleton<IMessageRouter, MessageRouter>();
                 services.AddSingleton<IPacketCodec, DefaultPacketCodec>();
                 services.AddSingleton<INetListenerProvider, DotNettyListenerProvider>();
                 var appSessionContainer = new AppSessionContainer<AppSession>();
