@@ -24,7 +24,7 @@ namespace Argo
             set => _lastAccessTime = value;
         }
 
-        internal FrontendSession()
+        public FrontendSession()
         {
             _createTime = DateTime.Now;
         }

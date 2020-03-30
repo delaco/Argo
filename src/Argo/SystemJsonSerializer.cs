@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Text.Encodings.Web;
 
 namespace Argo
 {
@@ -20,10 +21,8 @@ namespace Argo
 
         public Task<T> DeserializeAsync<T>(byte[] serializedObject)
         {
-            using (var stream = new MemoryStream(serializedObject))
-            {
-                return JsonSerializer.DeserializeAsync<T>(stream, _serializerOptions).AsTask();
-            }
+            using var stream = new MemoryStream(serializedObject);
+            return JsonSerializer.DeserializeAsync<T>(stream, _serializerOptions).AsTask();
         }
 
         public byte[] Serialize<T>(T item)
@@ -40,7 +39,8 @@ namespace Argo
         {
             _serializerOptions = new JsonSerializerOptions()
             {
-                IgnoreNullValues = true
+                IgnoreNullValues = true,
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
             };
 
             return _serializerOptions;
