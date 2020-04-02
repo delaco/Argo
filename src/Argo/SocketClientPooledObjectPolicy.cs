@@ -8,8 +8,8 @@ namespace Argo
     public class SocketClientPooledObjectPolicy : IPooledObjectPolicy<SocketClient>
     {
         private ISocketClientProvider _socketClientProvider;
-        private SocketClientOptions _socketClientOptions;
-        public SocketClientPooledObjectPolicy(SocketClientOptions socketClientOptions, ISocketClientProvider socketClientProvider)
+        private ClientOptions _socketClientOptions;
+        public SocketClientPooledObjectPolicy(ClientOptions socketClientOptions, ISocketClientProvider socketClientProvider)
         {
             _socketClientProvider = socketClientProvider ?? throw new ArgumentNullException(nameof(socketClientProvider));
             _socketClientOptions = socketClientOptions ?? throw new ArgumentNullException(nameof(socketClientOptions));

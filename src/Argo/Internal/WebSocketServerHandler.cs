@@ -98,7 +98,7 @@ namespace Argo.Internal
                 _logger.LogInformation($"New client to handshake:{ctx.Channel}");
                 var appSession = new AppSession();
                 var messageHandler = new DotNettyMessageHandlerProvider(ctx.Channel, null).Create();
-                appSession.Initialize(appSession.RemoteAddress, messageHandler);
+                appSession.Initialize(ctx.Channel.Id.ToString(), appSession.RemoteAddress, messageHandler);
 
                 this._appSessionContainer.Set(ctx.Channel.Id.ToString(), appSession);
                 this._handshaker.HandshakeAsync(ctx.Channel, req);

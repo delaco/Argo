@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.ObjectPool;
+using Microsoft.Extensions.Options;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -60,6 +61,7 @@ namespace Argo
             serviceCollection.AddSingleton<ISocketClientProvider, DottNettyClientAdapter>();
             serviceCollection.AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>();
             serviceCollection.AddSingleton<ISocketClientPoolContainer, SocketClientPoolContainer>();
+
             return serviceCollection;
         }
 

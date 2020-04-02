@@ -26,9 +26,9 @@ namespace Argo
 
         public IMessageHandler MessageHandler => _messageHandler;
 
-        public virtual void Initialize(EndPoint remoteAddress, IMessageHandler messageHandler)
+        public virtual void Initialize(string id, EndPoint remoteAddress, IMessageHandler messageHandler)
         {
-            _id = Guid.NewGuid().ToString();
+            _id = id;
             _createTime = DateTime.Now;
             _remoteAddress = remoteAddress;
             _messageHandler = messageHandler;

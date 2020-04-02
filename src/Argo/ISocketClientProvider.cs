@@ -2,6 +2,6 @@
 {
     public interface ISocketClientProvider
     {
-        SocketClient Create(SocketClientOptions socketClientOptions);
+        SocketClient Create(ClientOptions socketClientOptions);
     }
 }

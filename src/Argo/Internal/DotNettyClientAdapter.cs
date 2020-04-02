@@ -25,7 +25,7 @@ namespace Argo.Internal
             _packetCodec = _serviceProvider.GetRequiredService<IPacketCodec>();
         }
 
-        public SocketClient Create(SocketClientOptions option)
+        public SocketClient Create(ClientOptions option)
         {
             Contract.Requires(option != null);
             var group = new MultithreadEventLoopGroup();

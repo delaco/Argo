@@ -9,24 +9,24 @@ namespace Argo
     /// </summary>
     public abstract class FrontendSession : ISession
     {
-        private DateTime _createTime;
-        private DateTime _lastAccessTime;
+        public virtual string Key { get; set; }
 
-        public string UId { get; }
+        public string FrontendId { get; set; }
 
-        public string Host { get; }
+        public string Host { get; set; }
 
-        public DateTime CreateTime => _createTime;
+        public DateTime CreateTime { get; }
 
         public DateTime LastAccessTime
         {
-            get => _lastAccessTime;
-            set => _lastAccessTime = value;
+            get;
+            set;
         }
 
         public FrontendSession()
         {
-            _createTime = DateTime.Now;
+            CreateTime = DateTime.Now;
+            LastAccessTime = DateTime.Now;
         }
     }
 }

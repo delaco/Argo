@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 
 namespace Argo
 {
@@ -21,17 +22,20 @@ namespace Argo
 
         public bool Contains(string id)
         {
+            Contract.Requires(id != null);
             return Members.ContainsKey(id);
         }
 
-        public void Set(string index, T value)
+        public void Set(string id, T value)
         {
-            Members[index] = value;
+            Contract.Requires(id != null);
+            Members[id] = value;
         }
 
-        public T Get(string index)
+        public T Get(string id)
         {
-            if (Members.TryGetValue(index, out T data))
+            Contract.Requires(id != null);
+            if (Members.TryGetValue(id, out T data))
                 return data;
 
             return default;
@@ -56,6 +60,7 @@ namespace Argo
 
         public void Remove(string id)
         {
+            Contract.Requires(id != null);
             Members.TryRemove(id, out _);
         }
     }

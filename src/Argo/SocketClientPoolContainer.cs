@@ -26,7 +26,7 @@ namespace Argo
             ISocketClientProvider socketClientProvider,
             ObjectPoolProvider objectPoolProvider)
         {
-            this._options = (options ?? throw new ArgumentNullException(nameof(options))).Value;
+            this._options = options.Value ?? throw new ArgumentNullException(nameof(options));
             _objectPoolProvider = objectPoolProvider ?? throw new ArgumentNullException(nameof(objectPoolProvider));
             _socketClientProvider = socketClientProvider ?? throw new ArgumentNullException(nameof(socketClientProvider));
         }

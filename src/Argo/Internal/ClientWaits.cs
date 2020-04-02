@@ -53,7 +53,7 @@ namespace Argo.Internal
         {
             if (_waits.TryGetValue(key, out DotNettyMessageHandler messageHandler))
             {
-                messageHandler.AutoResetEvent.WaitOne(TimeSpan.FromSeconds(5));
+                messageHandler.AutoResetEvent.WaitOne(TimeSpan.FromSeconds(500000));
                 _waits.TryRemove(key, out _);
             }
             else

@@ -5,10 +5,10 @@ namespace Argo
 {
     public class RemoteOptions
     {
-        public List<SocketClientOptions> Remotes { get; set; }
+        public List<ClientOptions> Remotes { get; set; }
     }
 
-    public class SocketClientOptions
+    public class ClientOptions
     {
         public string Name { get; set; }
 

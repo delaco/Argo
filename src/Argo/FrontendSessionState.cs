@@ -24,21 +24,21 @@ namespace Argo
             };
         }
 
-        public TSession Get(string uId)
+        public TSession Get(string key)
         {
-            var bytes = this.DistributedCache.Get(uId);
+            var bytes = this.DistributedCache.Get(key);
             return Serializer.Deserialize<TSession>(bytes);
         }
 
         public void Add(TSession session)
         {
             var bytes = Serializer.Serialize(session);
-            DistributedCache.Set(session.UId, bytes, _distributedCacheEntryOptions);
+            DistributedCache.Set(session.Key, bytes, _distributedCacheEntryOptions);
         }
 
-        public void Remove(string uId)
+        public void Remove(string key)
         {
-            DistributedCache.Remove(uId);
+            DistributedCache.Remove(key);
         }
     }
 }
