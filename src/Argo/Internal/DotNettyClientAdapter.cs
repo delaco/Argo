@@ -70,15 +70,16 @@ namespace Argo.Internal
             private readonly IServiceProvider _serviceProvider;
             private readonly bool _autoRelease;
 
+            private ClientMessageRouter _messageRouter;
+
             public IServiceProvider ServiceProvider => _serviceProvider;
 
             public ReceiverHandler(IServiceProvider serviceProvider, bool autoRelease)
             {
                 this._serviceProvider = serviceProvider;
                 this._autoRelease = autoRelease;
+                this._messageRouter = _serviceProvider.GetRequiredService<ClientMessageRouter>();
             }
-
-            bool AcceptInboundMessage(object msg) => msg is IPacket;
 
             public override void ChannelInactive(IChannelHandlerContext context)
             {
@@ -90,8 +91,9 @@ namespace Argo.Internal
                 bool release = true;
                 try
                 {
-                    if (this.AcceptInboundMessage(msg))
+                    if (msg is IPacket packet)
                     {
+                        _messageRouter.Route(new RequestContext() { Request = packet });
                     }
                     else
                     {

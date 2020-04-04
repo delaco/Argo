@@ -139,13 +139,11 @@ namespace Argo.Internal
             byteBuffer.ReadBytes(readBytes);
             var message = _packetCodec.Decode(readBytes);
 
-            var requestContext = new RequestContext(appSession, message);
-            var commandDescriptor = _commandContainer.Get(requestContext);
+            var requestContext = new RequestContext() { AppSession = appSession, Request = message };
+            var commandDescriptor = _commandContainer.Get(message.Command);
             if (commandDescriptor != null)
             {
-                var commandContext = new CommandContext(requestContext,
-                    commandDescriptor,
-                    _serviceProvider);
+                var commandContext = new CommandContext(commandDescriptor, _serviceProvider);
                 if (!(_commandActivator.Create(commandContext) is ICommand command))
                 {
                     throw new NotImplementedException();

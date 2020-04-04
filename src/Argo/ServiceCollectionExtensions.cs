@@ -56,6 +56,7 @@ namespace Argo
         {
             serviceCollection.Configure<RemoteOptions>(config);
             serviceCollection.AddSingleton<ClientWaits>();
+            serviceCollection.AddSingleton<ClientMessageRouter, DefaultClientMessageRouter>();
             serviceCollection.AddSingleton<IPacketCodec, DefaultPacketCodec>();
             serviceCollection.AddSingleton<IMessageHandlerProvider, DotNettyMessageHandlerProvider>();
             serviceCollection.AddSingleton<ISocketClientProvider, DottNettyClientAdapter>();

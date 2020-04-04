@@ -33,16 +33,11 @@ namespace Argo.Commands
             }
         }
 
-        public CommandDescriptor Get(RequestContext context)
+        public CommandDescriptor Get(int command)
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
-
             var cache = Current;
 
-            if (cache.Entries.TryGetValue(context.Request.Command, out CommandDescriptor descriptor))
+            if (cache.Entries.TryGetValue(command, out CommandDescriptor descriptor))
             {
                 return descriptor;
             }

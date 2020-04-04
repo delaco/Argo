@@ -90,7 +90,7 @@ namespace Argo.Internal
                 if (msg is IPacket packet)
                 {
                     _logger.LogInformation($"The msg {msg} from {channel} has been read.");
-                    var requestContext = new RequestContext(session, packet);
+                    var requestContext = new RequestContext() { AppSession = session, Request = packet };
                     _messageRouter.Route(requestContext);
                 }
                 else

@@ -2,6 +2,6 @@
 {
     public interface ICommandDescriptorContainer
     {
-        CommandDescriptor Get(RequestContext context);
+        CommandDescriptor Get(int command);
     }
 }

@@ -37,10 +37,10 @@ namespace Argo
             }
             else
             {
-                var commandDescriptor = this._commandContainer.Get(requestContext);
+                var commandDescriptor = this._commandContainer.Get(requestContext.Request.Command);
                 if (commandDescriptor != null)
                 {
-                    var commandContext = new CommandContext(requestContext, commandDescriptor, _serviceProvider);
+                    var commandContext = new CommandContext(commandDescriptor, _serviceProvider);
                     if (!(_commandActivator.Create(commandContext) is ICommand command))
                     {
                         throw new NotImplementedException(nameof(commandContext));

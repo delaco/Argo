@@ -35,7 +35,7 @@ namespace Argo.Commands
                     $"{nameof(CommandContext.CommandDescriptor)}' must not be null.");
             }
 
-            var serviceProvider = commandContext.RequestServices;
+            var serviceProvider = commandContext.ServiceProvider;
             return _typeActivatorCache.CreateInstance<object>(serviceProvider, commandTypeInfo.AsType());
         }
 

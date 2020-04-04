@@ -2,25 +2,20 @@
 {
     public class RequestContext
     {
-        private IPacket _packet;
-        private AppSession _appSession;
-
         /// <summary>
         /// Gets the request packet
         /// </summary>
         /// <returns></returns>
-        public IPacket Request => _packet;
+        public IPacket Request { get; set; }
 
         /// <summary>
         /// Gets the appSession
         /// </summary>
         /// <returns></returns>
-        public AppSession AppSession => _appSession;
+        public AppSession AppSession { get; set; }
 
-        public RequestContext(AppSession appSession, IPacket packet)
+        public RequestContext()
         {
-            this._appSession = appSession;
-            this._packet = packet;
         }
     }
 }
