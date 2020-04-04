@@ -5,6 +5,7 @@ namespace Argo
 {
     public class RemoteOptions
     {
+        public string CommandAssembly { get; set; }
         public List<ClientOptions> Remotes { get; set; }
     }
 
