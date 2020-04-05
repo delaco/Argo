@@ -16,9 +16,20 @@ namespace Argo
     public static class ServiceCollectionExtensions
     {
         internal static IServiceCollection AddCommands(this IServiceCollection services,
-            AssemblyPartManager assemblyPartManager,
             List<string> commandAssemblyArry)
         {
+            var assemblyPartManager = new AssemblyPartManager();
+            services.AddSingleton(assemblyPartManager);
+            if (!assemblyPartManager.FeatureProviders.OfType<CommandFeatureProvider>().Any())
+            {
+                assemblyPartManager.FeatureProviders.Add(new CommandFeatureProvider());
+            }
+
+            services.AddSingleton<ITypeActivatorCache, TypeActivatorCache>();
+            services.TryAddSingleton<ICommandDescriptorCollectionProvider, CommandDescriptorCollectionProvider>();
+            services.TryAddSingleton<ICommandDescriptorContainer, CommandDescriptorContainer>();
+            services.TryAddTransient<ICommandActivator, DefaultCommandActivator>();
+
             var commandAssemblies = new List<Assembly>();
             if (commandAssemblyArry != null && commandAssemblyArry.Any())
             {
@@ -45,35 +56,27 @@ namespace Argo
                 services.TryAddTransient(command, command);
             }
 
-            services.TryAddSingleton<ICommandDescriptorCollectionProvider, CommandDescriptorCollectionProvider>();
-            services.TryAddSingleton<ICommandDescriptorContainer, CommandDescriptorContainer>();
-            services.TryAddTransient<ICommandActivator, DefaultCommandActivator>();
-
             return services;
         }
 
-        public static IServiceCollection AddSocketClient(this IServiceCollection serviceCollection, IConfiguration config)
+        public static IServiceCollection AddSocketClient(this IServiceCollection services, IConfiguration config)
         {
-            serviceCollection.Configure<RemoteOptions>(config);
-            serviceCollection.AddSingleton<ClientWaits>();
-            serviceCollection.AddSingleton<ITypeActivatorCache, TypeActivatorCache>();
-            serviceCollection.AddSingleton<ClientMessageRouter, DefaultClientMessageRouter>();
-            serviceCollection.AddSingleton<IPacketCodec, DefaultPacketCodec>();
-            serviceCollection.AddSingleton<IMessageHandlerProvider, DotNettyMessageHandlerProvider>();
-            serviceCollection.AddSingleton<ISocketClientProvider, DottNettyClientAdapter>();
-            serviceCollection.AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>();
-            serviceCollection.AddSingleton<ISocketClientPoolContainer, SocketClientPoolContainer>();
-            var partManager = new AssemblyPartManager();
-            serviceCollection.AddSingleton(partManager);
-            if (!partManager.FeatureProviders.OfType<CommandFeatureProvider>().Any())
-            {
-                partManager.FeatureProviders.Add(new CommandFeatureProvider());
-            }
+            services.Configure<RemoteOptions>(config);
+            services.AddSingleton<ClientWaits>();
+            services.AddSingleton<ClientMessageRouter, DefaultClientMessageRouter>();
+            services.AddSingleton<IPacketCodec, DefaultPacketCodec>();
+            services.AddSingleton<IMessageHandlerProvider, DotNettyMessageHandlerProvider>();
+            services.AddSingleton<ISocketClientProvider, DottNettyClientAdapter>();
+            services.AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>();
+            services.AddSingleton<ISocketClientPoolContainer, SocketClientPoolContainer>();
 
             var options = ConfigurationBinder.Get<RemoteOptions>(config);
-            serviceCollection.AddCommands(partManager, new List<string>() { options.CommandAssembly });
+            if (!string.IsNullOrEmpty(options.CommandAssembly))
+            {
+                services.AddCommands(new List<string>() { options.CommandAssembly });
+            }
 
-            return serviceCollection;
+            return services;
         }
 
         internal static T GetRequestService<T>(this IServiceCollection services)

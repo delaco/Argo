@@ -12,15 +12,15 @@ namespace Argo
         /// <summary>
         /// SendAsync
         /// </summary>
-        /// <param name="message"></param>
+        /// <param name="packet"></param>
         /// <returns></returns>
-        Task SendAsync(IPacket message);
+        Task SendAsync(IPacket packet);
 
         /// <summary>
-        /// Send
+        /// Send and recevie
         /// </summary>
-        /// <param name="message"></param>
+        /// <param name="packet"></param>
         /// <returns></returns>
-        Task<IPacket> Send(IPacket message);
+        Task<IPacket> SendAndRecevieAsync(IPacket packet);
     }
 }

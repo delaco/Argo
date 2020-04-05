@@ -25,7 +25,7 @@ namespace Argo
 
         public Task<IPacket> Send(IPacket message)
         {
-            return _messageHandler.Send(message);
+            return _messageHandler.SendAndRecevieAsync(message);
         }
 
         protected virtual void Dispose(bool disposing)

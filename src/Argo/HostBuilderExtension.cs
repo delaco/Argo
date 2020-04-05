@@ -16,10 +16,6 @@ namespace Argo
             return builder.ConfigureServices((services) =>
             {
                 services.Configure<ServerOptions>(config);
-                var partManager = new AssemblyPartManager();
-                services.AddSingleton(partManager);
-                ConfigureFeatureProviders(partManager);
-                services.AddSingleton<ITypeActivatorCache, TypeActivatorCache>();
                 services.AddSingleton<IPassThroughRuleProvider, PassThroughRuleProvider>();
                 services.AddSingleton<IMessageRouter, MessageRouter>();
                 services.AddSingleton<IPacketCodec, DefaultPacketCodec>();
@@ -34,18 +30,10 @@ namespace Argo
                 {
                     options.Listeners.ForEach(op =>
                     {
-                        services.AddCommands(partManager, op.CommandAssemblies);
+                        services.AddCommands(op.CommandAssemblies);
                     });
                 }
             });
-        }
-
-        public static void ConfigureFeatureProviders(AssemblyPartManager manager)
-        {
-            if (!manager.FeatureProviders.OfType<CommandFeatureProvider>().Any())
-            {
-                manager.FeatureProviders.Add(new CommandFeatureProvider());
-            }
         }
     }
 }

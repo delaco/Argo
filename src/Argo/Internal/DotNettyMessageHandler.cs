@@ -24,26 +24,28 @@ namespace Argo.Internal
             await _channel.WriteAndFlushAsync(message).ConfigureAwait(false);
         }
 
-        public Task<IPacket> Send(IPacket message)
+        public Task<IPacket> SendAndRecevieAsync(IPacket message)
         {
             if (_clientWait == null)
                 throw new ArgumentNullException(nameof(_clientWait));
 
-            return Task.Run(() =>
+            return Task.FromResult(SendAndRecevie(message));
+        }
+
+        protected IPacket SendAndRecevie(IPacket message)
+        {
+            this.AyscResponse = null;
+            var key = _channel.Id.ToString();
+            _clientWait.Start(key, this);
+            _channel.WriteAndFlushAsync(message);
+            _clientWait.Wait(key);
+
+            if (this.AyscResponse == null)
             {
-                this.AyscResponse = null;
-                var key = _channel.Id.ToString();
-                _clientWait.Start(key, this);
-                _channel.WriteAndFlushAsync(message);
-                _clientWait.Wait(key);
+                throw new TimeoutException($"Send to remote server timeout:{_channel}");
+            }
 
-                if (this.AyscResponse == null)
-                {
-                    throw new TimeoutException($"Send to remote server timeout:{_channel}");
-                }
-
-                return this.AyscResponse;
-            });
+            return this.AyscResponse;
         }
 
         protected virtual void Dispose(bool disposing)
