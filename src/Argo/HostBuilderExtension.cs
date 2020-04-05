@@ -34,13 +34,13 @@ namespace Argo
                 {
                     options.Listeners.ForEach(op =>
                     {
-                        services.AddCommands(partManager, op);
+                        services.AddCommands(partManager, op.CommandAssemblies);
                     });
                 }
             });
         }
 
-        private static void ConfigureFeatureProviders(AssemblyPartManager manager)
+        public static void ConfigureFeatureProviders(AssemblyPartManager manager)
         {
             if (!manager.FeatureProviders.OfType<CommandFeatureProvider>().Any())
             {

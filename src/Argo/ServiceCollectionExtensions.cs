@@ -17,12 +17,12 @@ namespace Argo
     {
         internal static IServiceCollection AddCommands(this IServiceCollection services,
             AssemblyPartManager assemblyPartManager,
-            ListenerOptions netListenerOptions)
+            List<string> commandAssemblyArry)
         {
             var commandAssemblies = new List<Assembly>();
-            if (netListenerOptions.CommandAssemblies != null && netListenerOptions.CommandAssemblies.Any())
+            if (commandAssemblyArry != null && commandAssemblyArry.Any())
             {
-                var definedAssemblies = AssemblyUtil.GetAssembliesFromStrings(netListenerOptions.CommandAssemblies.ToArray());
+                var definedAssemblies = AssemblyUtil.GetAssembliesFromStrings(commandAssemblyArry.ToArray());
 
                 if (definedAssemblies.Any())
                     commandAssemblies.AddRange(definedAssemblies);
@@ -56,12 +56,22 @@ namespace Argo
         {
             serviceCollection.Configure<RemoteOptions>(config);
             serviceCollection.AddSingleton<ClientWaits>();
+            serviceCollection.AddSingleton<ITypeActivatorCache, TypeActivatorCache>();
             serviceCollection.AddSingleton<ClientMessageRouter, DefaultClientMessageRouter>();
             serviceCollection.AddSingleton<IPacketCodec, DefaultPacketCodec>();
             serviceCollection.AddSingleton<IMessageHandlerProvider, DotNettyMessageHandlerProvider>();
             serviceCollection.AddSingleton<ISocketClientProvider, DottNettyClientAdapter>();
             serviceCollection.AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>();
             serviceCollection.AddSingleton<ISocketClientPoolContainer, SocketClientPoolContainer>();
+            var partManager = new AssemblyPartManager();
+            serviceCollection.AddSingleton(partManager);
+            if (!partManager.FeatureProviders.OfType<CommandFeatureProvider>().Any())
+            {
+                partManager.FeatureProviders.Add(new CommandFeatureProvider());
+            }
+
+            var options = ConfigurationBinder.Get<RemoteOptions>(config);
+            serviceCollection.AddCommands(partManager, new List<string>() { options.CommandAssembly });
 
             return serviceCollection;
         }

@@ -25,8 +25,8 @@ namespace Argo.Internal
         {
             if (base.Decode(context, input) is IByteBuffer byteBuffer)
             {
-                var bodyLength = base.GetUnadjustedFrameLength(input, _packetCodec.LengthFieldOffset, _packetCodec.LengthFieldLength, _packetCodec.IsLittleEndian ? ByteOrder.LittleEndian : ByteOrder.BigEndian);
-                var readBytes = new byte[_packetCodec.HeaderLenght + bodyLength];
+                //var bodyLength = base.GetUnadjustedFrameLength(input, _packetCodec.LengthFieldOffset, _packetCodec.LengthFieldLength, _packetCodec.IsLittleEndian ? ByteOrder.LittleEndian : ByteOrder.BigEndian);
+                var readBytes = new byte[byteBuffer.ReadableBytes];
 
                 byteBuffer.ReadBytes(readBytes);
                 var message = _packetCodec.Decode(readBytes);

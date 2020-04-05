@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\AdvancedServer\Protos\Test.cs" Link="Test.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Google.Protobuf" Version="3.11.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Argo\Argo.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>
