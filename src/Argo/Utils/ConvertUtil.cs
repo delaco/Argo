@@ -8,33 +8,39 @@ namespace Argo.Utils
     {
         public static long GetFrameValue(Span<byte> byteBuffer, int fieldOffset, int fieldlength, bool littleEndian)
         {
-            var frameLength = fieldlength switch
+            switch (fieldlength)
             {
-                1 => byteBuffer[0],
-                2 => BitConverter.ToInt16(GetBytes(byteBuffer, fieldOffset, fieldlength, littleEndian)),
-                4 => BitConverter.ToInt32(GetBytes(byteBuffer, fieldOffset, fieldlength, littleEndian)),
-                8 => BitConverter.ToInt64(GetBytes(byteBuffer, fieldOffset, fieldlength, littleEndian)),
-                _ => throw new Exception("unsupported fieldLength: " + fieldlength + " (expected: 1, 2, 4 or 8)"),
-            };
-
-            return frameLength;
+                case 1:
+                    return byteBuffer[0];
+                case 2:
+                    return BitConverter.ToInt16(GetBytes(byteBuffer, fieldOffset, fieldlength, littleEndian), 0);
+                case 4:
+                    return BitConverter.ToInt32(GetBytes(byteBuffer, fieldOffset, fieldlength, littleEndian), 0);
+                case 8:
+                    return BitConverter.ToInt64(GetBytes(byteBuffer, fieldOffset, fieldlength, littleEndian), 0);
+                default:
+                    throw new Exception("unsupported fieldLength: " + fieldlength + " (expected: 1, 2, 4 or 8)");
+            }
         }
 
         public static Span<byte> GetFrameBuffer(long fieldValue, int fieldlength, bool littleEndian)
         {
-            var biteBuffer = fieldlength switch
+            switch (fieldlength)
             {
-                1 => new byte[] { (byte)fieldValue },
-                2 => GetBytes(BitConverter.GetBytes((short)fieldValue), littleEndian),
-                4 => GetBytes(BitConverter.GetBytes((int)fieldValue), littleEndian),
-                8 => GetBytes(BitConverter.GetBytes(fieldValue), littleEndian),
-                _ => throw new Exception("unsupported fieldLength: " + fieldlength + " (expected: 1, 2, 4 or 8)"),
-            };
-
-            return biteBuffer;
+                case 1:
+                    return new byte[] { (byte)fieldValue };
+                case 2:
+                    return GetBytes(BitConverter.GetBytes((short)fieldValue), littleEndian);
+                case 4:
+                    return GetBytes(BitConverter.GetBytes((int)fieldValue), littleEndian);
+                case 8:
+                    return GetBytes(BitConverter.GetBytes(fieldValue), littleEndian);
+                default:
+                    throw new Exception("unsupported fieldLength: " + fieldlength + " (expected: 1, 2, 4 or 8)");
+            }
         }
 
-        private static Span<byte> GetBytes(Span<byte> byteBuffer, int fieldOffset, int fieldlength, bool littleEndian)
+        private static byte[] GetBytes(Span<byte> byteBuffer, int fieldOffset, int fieldlength, bool littleEndian)
         {
             var result = byteBuffer.Slice(fieldOffset, fieldlength);
             if (BitConverter.IsLittleEndian != littleEndian)
@@ -42,7 +48,7 @@ namespace Argo.Utils
                 result.Reverse();
             }
 
-            return result;
+            return result.ToArray();
         }
 
         private static byte[] GetBytes(byte[] bytes, bool littleEndian)
