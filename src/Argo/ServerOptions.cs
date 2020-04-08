@@ -7,11 +7,20 @@ namespace Argo
     {
         public string ServerName { get; set; }
 
+        /// <summary>
+        /// 开启异常会话清理
+        /// </summary>
         public bool InvalidSessionRelease { get; set; } = false;
 
-        public int InvalidSessionMonitoreInterval { get; set; }
+        /// <summary>
+        /// Monitor执行间隔
+        /// </summary>
+        public int MonitorInterval { get; set; }
 
-        public int SessionDeadTime { get; set; }
+        /// <summary>
+        /// 会话失效时间（s）
+        /// </summary>
+        public int SessionDeadTime { get; set; } = 3600;
 
         public List<ListenerOptions> Listeners { get; set; }
     }

@@ -46,7 +46,7 @@ namespace Argo
                 && _serverMonitor != null)
             {
                 await _serverMonitor.Execute().ConfigureAwait(false);
-                await Task.Delay(TimeSpan.FromSeconds(_options.InvalidSessionMonitoreInterval), stoppingToken);
+                await Task.Delay(TimeSpan.FromSeconds(_options.MonitorInterval), stoppingToken);
             }
         }
     }

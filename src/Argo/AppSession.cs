@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DotNetty.Transport.Channels;
+using System;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -6,13 +7,13 @@ namespace Argo
 {
     public class AppSession : ISession
     {
-        private string _id;
         private DateTime _createTime;
         private DateTime _lastAccessTime;
         private EndPoint _remoteAddress;
         private IMessageHandler _messageHandler;
+        private IChannel _channel;
 
-        public string Id => _id;
+        public string Id => _channel.ToString();
 
         public DateTime CreateTime => _createTime;
 
@@ -26,9 +27,9 @@ namespace Argo
 
         public IMessageHandler MessageHandler => _messageHandler;
 
-        public virtual void Initialize(string id, EndPoint remoteAddress, IMessageHandler messageHandler)
+        public void Initialize(IChannel channel, EndPoint remoteAddress, IMessageHandler messageHandler)
         {
-            _id = id;
+            _channel = channel;
             _createTime = DateTime.Now;
             _remoteAddress = remoteAddress;
             _messageHandler = messageHandler;
@@ -42,6 +43,11 @@ namespace Argo
         public override string ToString()
         {
             return $"Id:{Id} CreateTime:{CreateTime} LastAccessTime:{LastAccessTime} {RemoteAddress}";
+        }
+
+        public async Task CloseAsync()
+        {
+            await _channel.CloseAsync();
         }
     }
 }
