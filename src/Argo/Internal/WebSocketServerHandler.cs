@@ -88,7 +88,7 @@ namespace Argo.Internal
             // Handshake
             var wsFactory = new WebSocketServerHandshakerFactory(
                 GetWebSocketLocation(req), null, true, 5 * 1024 * 1024);
-            this._handshaker = wsFactory.NewHandshaker(req);
+            _handshaker = wsFactory.NewHandshaker(req);
             if (this._handshaker == null)
             {
                 WebSocketServerHandshakerFactory.SendUnsupportedVersionResponse(ctx.Channel);
@@ -100,8 +100,8 @@ namespace Argo.Internal
                 var messageHandler = new DotNettyMessageHandlerProvider(ctx.Channel, null).Create();
                 appSession.Initialize(ctx.Channel.Id.ToString(), appSession.RemoteAddress, messageHandler);
 
-                this._appSessionContainer.Set(ctx.Channel.Id.ToString(), appSession);
-                this._handshaker.HandshakeAsync(ctx.Channel, req);
+                _appSessionContainer.Set(ctx.Channel.Id.ToString(), appSession);
+                _handshaker.HandshakeAsync(ctx.Channel, req);
             }
         }
 
@@ -118,7 +118,7 @@ namespace Argo.Internal
             {
                 // Check for closing frame
                 case CloseWebSocketFrame _:
-                    this._handshaker.CloseAsync(ctx.Channel, (CloseWebSocketFrame)frame.Retain());
+                    _handshaker.CloseAsync(ctx.Channel, (CloseWebSocketFrame)frame.Retain());
                     return;
                 case PingWebSocketFrame _:
                     ctx.WriteAsync(new PongWebSocketFrame((IByteBuffer)frame.Content.Retain()));
@@ -184,8 +184,7 @@ namespace Argo.Internal
                 throw new ArgumentNullException(nameof(ctx));
             }
 
-            Console.WriteLine($"{nameof(WebSocketServerHandler)} {0}", e);
-            ctx.CloseAsync();
+            _logger.LogWarning($"{nameof(WebSocketServerHandler)} {0}", e);
         }
 
         string GetWebSocketLocation(IFullHttpRequest req)
