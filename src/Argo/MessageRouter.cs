@@ -37,20 +37,25 @@ namespace Argo
             }
             else
             {
-                var commandDescriptor = this._commandContainer.Get(requestContext.Request.Command);
-                if (commandDescriptor != null)
+                try
                 {
-                    var commandContext = new CommandContext(commandDescriptor, _serviceProvider);
-                    if (!(_commandActivator.Create(commandContext) is ICommand command))
+                    var commandDescriptor = this._commandContainer.Get(requestContext.Request.Command);
+                    if (commandDescriptor != null)
                     {
-                        throw new NotImplementedException(nameof(commandContext));
+                        var commandContext = new CommandContext(commandDescriptor, _serviceProvider);
+                        if ((_commandActivator.Create(commandContext) is ICommand command))
+                        {
+                            command.Execute(requestContext);
+                        }
                     }
-
-                    command.Execute(requestContext);
+                    else
+                    {
+                        _logger.LogWarning($"The msg' command {requestContext.Request.Command} was not found.");
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    _logger.LogWarning($"The msg' command {requestContext.Request.Command} was not found.");
+                    _logger.LogError($"The msg' command {requestContext.Request.Command} catch an error {ex}.");
                 }
             }
         }
