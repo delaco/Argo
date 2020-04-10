@@ -13,7 +13,7 @@ namespace Argo
         private IMessageHandler _messageHandler;
         private IChannel _channel;
 
-        public string Id => _channel.ToString();
+        public string Id => _channel.Id.ToString();
 
         public DateTime CreateTime => _createTime;
 
