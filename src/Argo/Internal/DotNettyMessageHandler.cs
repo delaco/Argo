@@ -21,7 +21,7 @@ namespace Argo.Internal
 
         public async Task SendAsync(IPacket message)
         {
-            await _channel.WriteAndFlushAsync(message).ConfigureAwait(false);
+            await _channel.WriteAndFlushAsync(message);
         }
 
         public Task<IPacket> SendAndRecevieAsync(IPacket message)

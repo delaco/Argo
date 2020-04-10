@@ -13,6 +13,11 @@ namespace Argo.Internal
             this._clientWaits = clientWaits;
         }
 
+        public DotNettyMessageHandlerProvider(IChannel channel)
+        {
+            this._channel = channel;
+        }
+
         public IMessageHandler Create()
         {
             return new DotNettyMessageHandler(_channel, _clientWaits);

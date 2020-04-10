@@ -1,4 +1,5 @@
-﻿using DotNetty.Transport.Channels;
+﻿using Argo.Internal;
+using DotNetty.Transport.Channels;
 using System;
 using System.Net;
 using System.Threading.Tasks;
@@ -7,37 +8,29 @@ namespace Argo
 {
     public class AppSession : ISession
     {
-        private DateTime _createTime;
-        private DateTime _lastAccessTime;
-        private EndPoint _remoteAddress;
-        private IMessageHandler _messageHandler;
         private IChannel _channel;
 
         public string Id => _channel.Id.ToString();
 
-        public DateTime CreateTime => _createTime;
+        public DateTime CreateTime { get; private set; }
 
-        public DateTime LastAccessTime
-        {
-            get => _lastAccessTime;
-            set => _lastAccessTime = value;
-        }
+        public DateTime LastAccessTime { get; set; }
 
-        public EndPoint RemoteAddress => _remoteAddress;
+        public EndPoint RemoteAddress { get; private set; }
 
-        public IMessageHandler MessageHandler => _messageHandler;
+        public IMessageHandler MessageHandler { get; private set; }
 
-        public void Initialize(IChannel channel, EndPoint remoteAddress, IMessageHandler messageHandler)
+        public void Initialize(IChannel channel, EndPoint remoteAddress)
         {
             _channel = channel;
-            _createTime = DateTime.Now;
-            _remoteAddress = remoteAddress;
-            _messageHandler = messageHandler;
+            CreateTime = DateTime.Now;
+            RemoteAddress = remoteAddress;
+            MessageHandler = new DotNettyMessageHandlerProvider(channel).Create();
         }
 
         public async Task SendAsync(IPacket message)
         {
-            await _messageHandler.SendAsync(message).ConfigureAwait(false);
+            await MessageHandler.SendAsync(message);
         }
 
         public override string ToString()

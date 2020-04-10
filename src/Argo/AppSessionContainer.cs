@@ -29,7 +29,7 @@ namespace Argo
         public void Set(string id, T value)
         {
             Contract.Requires(id != null);
-            Members[id] = value;
+            Members.AddOrUpdate(id, value, (k1, v1) => value);
         }
 
         public T Get(string id)
