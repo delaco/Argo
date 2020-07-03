@@ -28,8 +28,7 @@ namespace Argo
             int lengthFieldOffset = 10,
             int lengthFieldLength = 4,
             int headerLenght = 14,
-            bool isLittleEndian = true
-            )
+            bool isLittleEndian = true)
         {
             CommandFieldOffset = commandFieldOffset;
             CommandFieldLength = commandFieldLength;

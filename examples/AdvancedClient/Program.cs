@@ -53,7 +53,7 @@ namespace AdvancedClient
             {
                 var client = socketClientPoolContainer.Get("localhost");
                 var random = new Random(1);
-                for (var i = 0; i < 10000; i++)
+                for (var i = 0; i < 10; i++)
                 {
                     Proxy_UserEntryReq req = new Proxy_UserEntryReq()
                     {

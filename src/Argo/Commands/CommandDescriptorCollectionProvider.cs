@@ -16,7 +16,7 @@ namespace Argo.Commands
         }
 
         /// <summary>
-        /// Returns a cached collection of <see cref="CommandDescriptor" />.
+        /// Returns a cached command of <see cref="CommandDescriptor" />.
         /// </summary>
         public CommandDescriptorCollection CommandDescriptors
         {
@@ -40,12 +40,13 @@ namespace Argo.Commands
             var commandTypes = feature.Commands;
             foreach (var typeInfo in commandTypes)
             {
+     
                 var attribute = typeInfo.GetCustomAttribute<CommandAttribute>();
-                if (attribute != null && !attribute.Invalid)
+                if (attribute != null)
                 {
                     results.Add(new CommandDescriptor()
                     {
-                        Key = attribute.Id,
+                        // Key = attribute.Id,
                         Name = typeInfo.Name,
                         CommandTypeInfo = typeInfo
                     });

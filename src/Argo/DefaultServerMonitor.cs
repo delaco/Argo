@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Argo
 {
-    public class DefaultServerMonitor : IServerMonitor
+    public class DefaultServerMonitor : IMonitor
     {
         ILogger<DefaultServerMonitor> Logger { get; }
         ServerOptions ServerOptions { get; }
@@ -13,23 +13,19 @@ namespace Argo
         AppSessionContainer<AppSession> AppSessionContainer { get; }
         public DefaultServerMonitor(IOptions<ServerOptions> options,
             AppSessionContainer<AppSession> appSessionContainer,
-            ILogger<DefaultServerMonitor> logger
-            )
+            ILogger<DefaultServerMonitor> logger)
         {
             ServerOptions = options.Value;
             AppSessionContainer = appSessionContainer;
             Logger = logger;
         }
 
-        public virtual Task Execute()
+        public virtual async Task Execute()
         {
-            return Task.Run(() =>
-            {
-                ClearAppSession();
-            });
+            await ClearAppSession();
         }
 
-        private void ClearAppSession()
+        private async Task ClearAppSession()
         {
             var now = DateTime.Now;
             foreach (var appSession in AppSessionContainer.Members.Values)
@@ -39,13 +35,18 @@ namespace Argo
                 {
                     try
                     {
-                        appSession.CloseAsync().GetAwaiter().GetResult();
+                        await appSession.CloseAsync();
                     }
                     catch (Exception ex)
                     {
                         Logger.LogWarning($"The {appSession} catch an exception:{ex} when close");
                     }
-                    Logger.LogInformation($"Thesession:{appSession} has been cleaned");
+
+                    Logger.LogInformation($"The session:{appSession} has been cleaned");
+                }
+                else
+                {
+                    await Task.CompletedTask;
                 }
             }
         }

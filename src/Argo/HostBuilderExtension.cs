@@ -23,16 +23,9 @@ namespace Argo
                 var appSessionContainer = new AppSessionContainer<AppSession>();
                 services.AddSingleton(appSessionContainer);
                 services.AddSingleton<IHostedService, NetListenerService>();
-                services.AddSingleton<IServerMonitor, DefaultServerMonitor>();
+                services.AddSingleton<IMonitor, DefaultServerMonitor>();
                 services.AddSingleton<IHostedService, MonitorService>();
-                var options = ConfigurationBinder.Get<ServerOptions>(config);
-                if (options != null && options.Listeners.Any())
-                {
-                    options.Listeners.ForEach(op =>
-                    {
-                        services.AddCommands(op.CommandAssemblies);
-                    });
-                }
+                services.AddCommands();
             });
         }
     }

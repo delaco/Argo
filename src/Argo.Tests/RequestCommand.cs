@@ -10,7 +10,7 @@ namespace Argo.Tests
     {
         public void Execute(RequestContext requestContext)
         {
-            CodedInputStream codedInputStream = new CodedInputStream(requestContext.Request.Body.ToArray());
+            CodedInputStream codedInputStream = new CodedInputStream(requestContext.Request.Body);
 
             MessageParser<TRequest> messageParser = new MessageParser<TRequest>(() => new TRequest());
             var request = messageParser.ParseFrom(codedInputStream);

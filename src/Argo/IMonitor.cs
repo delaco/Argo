@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Argo
 {
-    public interface IServerMonitor
+    public interface IMonitor
     {
         Task Execute();
     }

@@ -34,7 +34,5 @@ namespace Argo
         public int Port { get; set; }
 
         public bool Ssl { get; set; }
-
-        public List<string> CommandAssemblies { get; set; }
     }
 }

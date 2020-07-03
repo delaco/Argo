@@ -4,24 +4,17 @@ namespace Argo
 {
     public class PacketInfo : IPacket
     {
-        private byte[] _body;
         public int Command { get; }
 
         public int Sequence { get; }
 
-        public Span<byte> Body
-        {
-            get
-            {
-                return _body;
-            }
-        }
+        public byte[] Body { get; }
 
         public PacketInfo(int command, int sequence, byte[] body)
         {
             Command = command;
             Sequence = sequence;
-            _body = body;
+            Body = body;
         }
 
         public override string ToString()

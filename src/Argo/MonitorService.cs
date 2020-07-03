@@ -14,13 +14,13 @@ namespace Argo
     {
         private ILogger<MonitorService> _logger;
         private ServerOptions _options;
-        private IServerMonitor _serverMonitor;
+        private IMonitor _serverMonitor;
 
         protected IServiceProvider ServiceProvider { get; }
 
         public MonitorService(IServiceProvider serviceProvider,
             IOptions<ServerOptions> options,
-            IServerMonitor serverMonitor,
+            IMonitor serverMonitor,
             ILogger<MonitorService> logger)
         {
             ServiceProvider = serviceProvider;

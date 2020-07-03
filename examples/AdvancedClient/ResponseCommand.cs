@@ -15,7 +15,7 @@ namespace AdvancedServer
     {
         public void Execute(RequestContext requestContext)
         {
-            CodedInputStream codedInputStream = new CodedInputStream(requestContext.Request.Body.ToArray());
+            CodedInputStream codedInputStream = new CodedInputStream(requestContext.Request.Body);
 
             MessageParser<TResponse> messageParser = new MessageParser<TResponse>(() => new TResponse());
             var response = messageParser.ParseFrom(codedInputStream);

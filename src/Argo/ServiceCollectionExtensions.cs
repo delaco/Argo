@@ -15,8 +15,7 @@ namespace Argo
 {
     public static class ServiceCollectionExtensions
     {
-        internal static IServiceCollection AddCommands(this IServiceCollection services,
-            List<string> commandAssemblyArry)
+        internal static IServiceCollection AddCommands(this IServiceCollection services)
         {
             var assemblyPartManager = new AssemblyPartManager();
             services.AddSingleton(assemblyPartManager);
@@ -31,13 +30,6 @@ namespace Argo
             services.TryAddTransient<ICommandActivator, DefaultCommandActivator>();
 
             var commandAssemblies = new List<Assembly>();
-            if (commandAssemblyArry != null && commandAssemblyArry.Any())
-            {
-                var definedAssemblies = AssemblyUtil.GetAssembliesFromStrings(commandAssemblyArry.ToArray());
-
-                if (definedAssemblies.Any())
-                    commandAssemblies.AddRange(definedAssemblies);
-            }
 
             if (!commandAssemblies.Any())
             {
@@ -47,13 +39,6 @@ namespace Argo
             foreach (var assembly in commandAssemblies)
             {
                 assemblyPartManager.AssemblyParts.Add(new AssemblyPart(assembly));
-            }
-
-            var feature = new CommandFeature();
-            assemblyPartManager.PopulateFeature(feature);
-            foreach (var command in feature.Commands.Select(c => c.AsType()))
-            {
-                services.TryAddTransient(command, command);
             }
 
             return services;
@@ -69,12 +54,7 @@ namespace Argo
             services.AddSingleton<ISocketClientProvider, DottNettyClientAdapter>();
             services.AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>();
             services.AddSingleton<ISocketClientPoolContainer, SocketClientPoolContainer>();
-
-            var options = ConfigurationBinder.Get<RemoteOptions>(config);
-            if (!string.IsNullOrEmpty(options.CommandAssembly))
-            {
-                services.AddCommands(new List<string>() { options.CommandAssembly });
-            }
+            services.AddCommands();
 
             return services;
         }

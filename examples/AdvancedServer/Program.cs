@@ -19,7 +19,7 @@ namespace AdvancedServer
                 .UseArgo(config)
                 .ConfigureServices((service) =>
                 {
-                    service.AddSocketClient(config);
+                    //service.AddSocketClient(config);
                     service.AddStackExchangeRedisCache(options =>
                     {
                         options.Configuration = "127.0.0.1:6379";

@@ -11,6 +11,8 @@ namespace Argo.Commands
     /// </summary>
     public class CommandFeatureProvider : IFeatureProvider<CommandFeature>
     {
+        private const string CommandTypeNameSuffix = "Command";
+
         public void PopulateFeature(
             IEnumerable<AssemblyPart> parts,
             CommandFeature feature)
@@ -64,7 +66,13 @@ namespace Argo.Commands
                 return false;
             }
 
-            if (!typeInfo.IsDefined(typeof(CommandAttribute)))
+            if (typeInfo.IsDefined(typeof(NonCommandAttribute)))
+            {
+                return false;
+            }
+
+            if (!typeInfo.Name.EndsWith(CommandTypeNameSuffix, StringComparison.OrdinalIgnoreCase) &&
+              !typeInfo.IsDefined(typeof(CommandAttribute)))
             {
                 return false;
             }
