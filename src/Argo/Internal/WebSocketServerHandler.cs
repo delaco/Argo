@@ -97,7 +97,7 @@ namespace Argo.Internal
             {
                 _logger.LogInformation($"New client to handshake:{ctx.Channel}");
                 var appSession = new AppSession();
-                appSession.Initialize(ctx.Channel, appSession.RemoteAddress);
+                appSession.Initialize(ctx.Channel, ctx.Channel.RemoteAddress);
                 _appSessionContainer.Set(ctx.Channel.Id.ToString(), appSession);
                 _handshaker.HandshakeAsync(ctx.Channel, req);
             }
